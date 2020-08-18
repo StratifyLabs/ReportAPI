@@ -10,6 +10,11 @@ class Flowchart : public Writer
 {
 public:
 	Flowchart();
+
+	static var::String get_class_type(){
+		return "fc";
+	}
+
 };
 
 }

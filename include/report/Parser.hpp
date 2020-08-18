@@ -3,6 +3,7 @@
 
 #include <sapi/var/Vector.hpp>
 #include <sapi/var/String.hpp>
+#include <sapi/fs/File.hpp>
 
 namespace report {
 
@@ -41,13 +42,16 @@ private:
 
 	API_RAB(Parser,valid,false); //used if path is a empty
 	API_AC(Parser,var::String,output); //used if path is a empty
-	var::Vector<IntermediateData> m_intermediate_data; //used if path is a file or empty
+	var::Vector<IntermediateData> m_intermediate_data_list; //used if path is a file or empty
 	var::String m_directory_path;
 	var::String m_file_name;
 
 	bool is_use_intermediate_data() const {
 		return m_directory_path.is_empty();
 	}
+
+	int generate_csv_chart(const fs::File * output, const IntermediateData & data);
+	int generate_passthrough(const fs::File * output, const IntermediateData & data);
 
 };
 

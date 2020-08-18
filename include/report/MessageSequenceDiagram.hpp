@@ -9,6 +9,10 @@ class MessageSequenceDiagram
 {
 public:
 	MessageSequenceDiagram();
+
+	static var::String get_class_type(){
+		return "msd";
+	}
 };
 
 }

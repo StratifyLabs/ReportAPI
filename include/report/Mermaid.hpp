@@ -9,6 +9,10 @@ class Mermaid : public Writer
 {
 public:
 	Mermaid();
+
+	static var::String get_class_type(){
+		return "mmd";
+	}
 };
 
 }

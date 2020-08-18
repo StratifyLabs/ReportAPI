@@ -13,6 +13,9 @@ public:
 	};
 
 
+	static var::String get_class_type(){
+		return "csv";
+	}
 
 	explicit Csv(const Options & options);
 
@@ -20,6 +23,8 @@ public:
 		write(value);
 		return *this;
 	}
+
+
 
 private:
 

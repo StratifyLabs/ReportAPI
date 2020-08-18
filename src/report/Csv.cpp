@@ -8,7 +8,7 @@ Csv::Csv(const Options & options){
 	} else {
 		set_name(options.name());
 	}
-	set_type("csv");
+	set_type( get_class_type() );
 	set_prefix( get_prefix() );
 
 	write(options.header());

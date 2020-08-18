@@ -10,6 +10,10 @@ class Katex : public Writer
 {
 public:
 	Katex();
+
+	static var::String get_class_type(){
+		return "kt";
+	}
 };
 
 }
