@@ -74,7 +74,7 @@ Parser& Parser::parse_line(const var::String & line){
 	StringList input_list =
 			Tokenizer(line,
 								Tokenizer::ParseOptions().set_delimeters(":")
-								.set_maximum_token_count(3)
+								.set_maximum_delimeter_count(2)
 								).list();
 
 	if( input_list.count() == 0 ){
@@ -87,6 +87,7 @@ Parser& Parser::parse_line(const var::String & line){
 
 	if( input_list.count() != 3 ||
 			!is_type_valid(input_list.at(0)) ){
+		printf("using raw for %d: %s\n", input_list.count(), line.cstring());
 		name = "raw";
 		type = "";
 		value = line;
