@@ -2,6 +2,13 @@
 #include <sapi/var.hpp>
 #include <ChartAPI/chart.hpp>
 
+#include "report/Csv.hpp"
+#include "report/Table.hpp"
+#include "report/Flowchart.hpp"
+#include "report/Katex.hpp"
+#include "report/MessageSequenceDiagram.hpp"
+#include "report/Mermaid.hpp"
+#include "report/Table.hpp"
 #include "report/Parser.hpp"
 
 using namespace report;
@@ -23,23 +30,74 @@ Parser::Parser(const Options& options){
 	}
 }
 
-Parser& Parser::parse(const var::String & line){
+bool Parser::is_type_valid(const var::String class_type) const {
+	return class_type ==	Mermaid::get_class_type()
+			|| class_type == Flowchart::get_class_type()
+			|| class_type == MessageSequenceDiagram::get_class_type()
+			|| class_type == Katex::get_class_type()
+			|| class_type == Csv::get_class_type()
+			|| class_type == Table::get_class_type()
+			|| class_type == "";
+}
+
+Parser& Parser::parse(const var::String & input){
+	if( input.length() == 0 ){
+		return *this;
+	}
+
+	StringList line_list = input.split("\r\n");
+	u32 count = line_list.count();
+
+	if( input.back() == '\n' || count > 1 ){
+		parse_line(m_partial_line + line_list.at(0) + "\n");
+		m_partial_line.clear();
+	}
+
+	if( input.back() != '\n' ){
+		//last line is partial
+		m_partial_line = line_list.back();
+		count--;
+	}
+
+	for(u32 i=1; i < count; i++){
+		parse_line(line_list.at(i) + "\n");
+	}
+
+	return *this;
+}
+
+Parser& Parser::parse_line(const var::String & line){
 	if( is_valid() == false ){
 		return *this;
 	}
 
-	StringList input_list = Tokenizer(line,
-											Tokenizer::ParseOptions().set_delimeters(":")
-											.set_maximum_token_count(3)
-											).list();
+	StringList input_list =
+			Tokenizer(line,
+								Tokenizer::ParseOptions().set_delimeters(":")
+								.set_maximum_token_count(3)
+								).list();
 
-	if( input_list.count() != 3 ){
+	if( input_list.count() == 0 ){
 		return *this;
 	}
 
-	const String & value = input_list.at(2);
+	String name;
+	String type;
+	String value;
+
+	if( input_list.count() != 3 ||
+			!is_type_valid(input_list.at(0)) ){
+		name = "raw";
+		type = "";
+		value = line;
+	} else {
+		type = input_list.at(0);
+		name = input_list.at(1);
+		value = input_list.at(2);
+	}
+
 	IntermediateData data =
-			IntermediateData().set_name(input_list.at(0)).set_type(input_list.at(1));
+			IntermediateData().set_name(name).set_type(type);
 
 	if( is_use_intermediate_data() ){
 		u32 offset = m_intermediate_data_list.find(data);
@@ -87,8 +145,10 @@ int Parser::create_report(){
 
 		for(const IntermediateData & data: m_intermediate_data_list){
 
-			if( data.type() == "csv"){
-
+			if( data.type() == Csv::get_class_type() ){
+				generate_csv_chart(file, data);
+			} else if( data.type() == Table::get_class_type() ){
+				generate_csv_table(file, data);
 			} else {
 				generate_passthrough(file, data);
 			}
@@ -117,6 +177,49 @@ int Parser::generate_passthrough(const fs::File * output, const IntermediateData
 	output->write("```\n\n");
 	return 0;
 }
+
+
+int Parser::generate_csv_table(const fs::File * output, const IntermediateData & data){
+
+	if( data.entry_list().count() == 0 ){
+		output->write("> No data is available\n\n");
+		return 0;
+	}
+
+	StringList header_list = data.entry_list().front().split(",");
+
+	{
+		String line = "| ";
+		for(const String& item: header_list){
+			line += item + " |";
+		}
+		line += "\n";
+		output->write( line );
+	}
+
+	{
+		String line = "|";
+		for(const String& item: header_list){
+			line +=  "-------|";
+		}
+		line += "\n";
+		output->write( line );
+	}
+
+	for(u32 i=1; i < data.entry_list().count(); i++){
+		String line = "|";
+		StringList item_list = data.entry_list().at(i).split(",");
+		for(const String& item: item_list){
+			line += item + " |";
+		}
+		line += "\n\n";
+		output->write( line );
+	}
+
+
+	return 0;
+}
+
 
 int Parser::generate_csv_chart(const fs::File * output, const IntermediateData & data){
 	//csv is not trivially handled -- needs some parsing
@@ -148,35 +251,35 @@ int Parser::generate_csv_chart(const fs::File * output, const IntermediateData &
 
 		for(u32 j=1; j < data.entry_list().count(); j++) {
 			data_set.append(
-				ChartJsStringDataPoint()
-					.set_x(data.entry_list().at(0))
-					.set_y(data.entry_list().at(j))
-					.to_object());
+						ChartJsStringDataPoint()
+						.set_x(data.entry_list().at(0))
+						.set_y(data.entry_list().at(j))
+						.to_object());
 		}
 
 		chart.data().append(data_set);
 	}
 
 	chart.options()
-		.set_scales(
-			ChartJsScales()
+			.set_scales(
+				ChartJsScales()
 				.append_x_axis(
 					ChartJsAxis()
-						.set_display(true)
-						.set_type(ChartJsAxis::type_linear)
-						.set_scale_label(
-							ChartJsScaleLabel().set_display(true).set_label(header_list.at(0))))
+					.set_display(true)
+					.set_type(ChartJsAxis::type_linear)
+					.set_scale_label(
+						ChartJsScaleLabel().set_display(true).set_label(header_list.at(0))))
 				.append_y_axis(
 					ChartJsAxis()
-						.set_type(ChartJsAxis::type_linear)
-						.set_display(true)
-						.set_ticks(
-							ChartJsAxisTicks().set_minimum(0).set_maximum(100).set_step_size(
-								10))
-						.set_scale_label(ChartJsScaleLabel().set_display(true).set_label(
-							"Utilization Percentage"))))
-		.set_legend(ChartJsLegend().set_display(true))
-		.set_title(ChartJsTitle().set_display(true).set_text("Task Analysis"));
+					.set_type(ChartJsAxis::type_linear)
+					.set_display(true)
+					.set_ticks(
+						ChartJsAxisTicks().set_minimum(0).set_maximum(100).set_step_size(
+							10))
+					.set_scale_label(ChartJsScaleLabel().set_display(true).set_label(
+														 "Utilization Percentage"))))
+			.set_legend(ChartJsLegend().set_display(true))
+			.set_title(ChartJsTitle().set_display(true).set_text("Task Analysis"));
 
 	output->write(JsonDocument().stringify(chart.to_object()));
 

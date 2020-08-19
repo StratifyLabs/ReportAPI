@@ -71,7 +71,7 @@ public:
 		API_AF(TransitionOptions,enum links,link,link_arrow);
 	};
 
-	MermaidGraph& write_transition(const TransitionOptions & options);
+	MermaidGraph& transition(const TransitionOptions & options);
 
 private:
 	u32 m_sequence_count;

@@ -7,6 +7,7 @@ set(SOURCES
 	Mermaid.cpp
 	Katex.cpp
 	Csv.cpp
+	Table.cpp
 	Flowchart.cpp
 	PARENT_SCOPE
 	)

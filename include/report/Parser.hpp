@@ -45,13 +45,19 @@ private:
 	var::Vector<IntermediateData> m_intermediate_data_list; //used if path is a file or empty
 	var::String m_directory_path;
 	var::String m_file_name;
+	var::String m_partial_line;
 
 	bool is_use_intermediate_data() const {
 		return m_directory_path.is_empty();
 	}
 
+	bool is_type_valid(const var::String class_type) const;
+
+	Parser& parse_line(const var::String & input);
 	int generate_csv_chart(const fs::File * output, const IntermediateData & data);
+	int generate_csv_table(const fs::File * output, const IntermediateData & data);
 	int generate_passthrough(const fs::File * output, const IntermediateData & data);
+	int generate_raw(const fs::File * output, const IntermediateData & data);
 
 };
 
