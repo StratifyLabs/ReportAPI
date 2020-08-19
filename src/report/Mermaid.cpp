@@ -76,7 +76,6 @@ MermaidGraph& MermaidGraph::transition(
 		enum links link_arrow,
 		const MermaidNode & to,
 		const var::String & message){
-	printf("write transition ---- \n");
 	write("  " + from.node() + get_link_string(link_arrow) +
 				(message.is_empty() ? var::String() : ("|" + message + "|")
 															+ to.node()));

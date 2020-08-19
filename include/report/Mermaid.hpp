@@ -95,7 +95,6 @@ public:
 		m_mermaid_graph(MermaidGraph::Options().set_name(name).set_direction("LR")){}
 
 	void push(const char * name){
-		printf("-------------------pushing node: %d:%s\n", m_call_stack.count(), name);
 		MermaidNode node(name, MermaidNode::shape_round);
 		if( m_call_stack.count() ){
 			m_mermaid_graph.transition(
@@ -121,7 +120,6 @@ public:
 
 	void pop(){
 		if( m_call_stack.count() ){
-			printf("-------------------popping node %s\n", m_call_stack.top().node().cstring());
 			m_call_stack.pop();
 		}
 	}
