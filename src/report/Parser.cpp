@@ -87,7 +87,6 @@ Parser& Parser::parse_line(const var::String & line){
 
 	if( input_list.count() != 3 ||
 			!is_type_valid(input_list.at(0)) ){
-		printf("using raw for %d: %s\n", input_list.count(), line.cstring());
 		name = "raw";
 		type = "";
 		value = line;
