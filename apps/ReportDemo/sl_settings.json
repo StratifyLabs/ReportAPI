@@ -8,11 +8,14 @@
    "uid": "9cQyOTk3fZXOuMtPyf5j9X4H4b83",
    "version": "0.1",
    "ramSize": 0,
-   "timestamp": 1597017007,
-   "documentId": "",
+   "timestamp": 1598394988,
+   "documentId": "OTGCYRuLeXaWLZ1BxKRA",
    "hardwareId": "",
    "team": "41zVSUkV7jVX9bviWjpR",
    "tagList": [
       "utility"
-   ]
+   ],
+   "buildList": {
+      "6n3QlMWv5ixKpNLUoguO": "0.1"
+   }
 }
