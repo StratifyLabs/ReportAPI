@@ -87,9 +87,12 @@ Parser& Parser::parse_line(const var::String & line){
 
 	if( input_list.count() != 3 ||
 			!is_type_valid(input_list.at(0)) ){
-		name = "raw";
-		type = "";
-		value = line;
+
+		if( line.length() > 1 ){
+			name = "raw";
+			type = "";
+			value = line;
+		}
 	} else {
 		type = input_list.at(0);
 		name = input_list.at(1);
@@ -153,6 +156,8 @@ int Parser::create_report(){
 				generate_passthrough(file, data);
 			}
 
+			output_file.write("\n");
+
 		}
 
 	} else {
@@ -168,13 +173,16 @@ int Parser::create_report(){
 int Parser::generate_passthrough(const fs::File * output, const IntermediateData & data){
 	//most formats are just passthrough data
 
-	output->write("**" + data.name() + "**\n\n");
+	if( !data.name().is_empty() || !data.type().is_empty() ){
 
-	output->write("```" + data.type() + "\n");
-	for(const String & entry: data.entry_list()){
-		output->write(entry);
+		output->write("**" + data.name() + "**\n\n");
+
+		output->write("```" + data.type() + "\n");
+		for(const String & entry: data.entry_list()){
+			output->write(entry);
+		}
+		output->write("```\n\n");
 	}
-	output->write("```\n\n");
 	return 0;
 }
 
@@ -240,6 +248,8 @@ int Parser::generate_csv_chart(const fs::File * output, const IntermediateData &
 	ChartJs chart;
 	chart.set_type(ChartJs::type_line);
 
+	Array<String, 2> x_extrema;
+
 	u32 color = 0;
 	for (u32 i=1; i < header_list.count(); i++) {
 
@@ -247,13 +257,21 @@ int Parser::generate_csv_chart(const fs::File * output, const IntermediateData &
 
 		data_set
 				.set_label(header_list.at(i))
-				.set_border_color(ChartJsColor::get_standard(color++).set_alpha(128));
+				.set_border_color(ChartJsColor::get_standard(color++).set_alpha(128))
+				.set_background_color(ChartJsColor().set_alpha(0));
 
 		for(u32 j=1; j < data.entry_list().count(); j++) {
+			StringList data_list = data.entry_list().at(j).split(",");
+			if( x_extrema.at(0).is_empty() ){
+				x_extrema.at(0) = data_list.at(0);
+			}
+
+			x_extrema.at(1) = data_list.at(0);
+
 			data_set.append(
 						ChartJsStringDataPoint()
-						.set_x(data.entry_list().at(0))
-						.set_y(data.entry_list().at(j))
+						.set_x(data_list.at(0))
+						.set_y(data_list.at(i))
 						.to_object());
 		}
 
@@ -267,21 +285,22 @@ int Parser::generate_csv_chart(const fs::File * output, const IntermediateData &
 					ChartJsAxis()
 					.set_display(true)
 					.set_type(ChartJsAxis::type_linear)
+					.set_ticks(ChartJsAxisTicks()
+										 .set_minimum(x_extrema.at(0).to_float())
+										 .set_maximum(x_extrema.at(1).to_float())
+										 .set_step_size(0.1f))
 					.set_scale_label(
 						ChartJsScaleLabel().set_display(true).set_label(header_list.at(0))))
 				.append_y_axis(
 					ChartJsAxis()
 					.set_type(ChartJsAxis::type_linear)
-					.set_display(true)
-					.set_ticks(
-						ChartJsAxisTicks().set_minimum(0).set_maximum(100).set_step_size(
-							10))
-					.set_scale_label(ChartJsScaleLabel().set_display(true).set_label(
-														 "Utilization Percentage"))))
+					.set_display(true)))
 			.set_legend(ChartJsLegend().set_display(true))
-			.set_title(ChartJsTitle().set_display(true).set_text("Task Analysis"));
+			.set_title(ChartJsTitle().set_display(true).set_text(data.name() + "(" + data.type() +")"));
 
+	output->write("\n\n**" + data.name() + "**\n\n```chartjs\n");
 	output->write(JsonDocument().stringify(chart.to_object()));
+	output->write("\n```\n\n");
 
 	return 0;
 }
