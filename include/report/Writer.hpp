@@ -8,6 +8,7 @@
 
 namespace report {
 
+#if !defined __win32
 class PosixWriter {
 public:
 	static int write_function(void * context, const char * buffer, int nbyte){
@@ -19,6 +20,7 @@ private:
 		return ::write(fileno(), buffer, nbyte);
 	}
 };
+#endif
 
 class FileWriter {
 public:
@@ -76,10 +78,12 @@ public:
 		m_write_function = DataFileWriter::write_function;
 	}
 
+#if !defined __win32
 	static void set_writer(PosixWriter * value){
 		m_context = static_cast<void*>(value);
 		m_write_function = PosixWriter::write_function;
 	}
+#endif
 
 	var::String get_prefix() const {
 		return type() + ":" + name() + ":";

@@ -2,3 +2,5 @@
 cmake_link/
 cmake_arm/
 *.user
+cmake_qt_link/
+cmake_qt_arm/
