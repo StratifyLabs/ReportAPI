@@ -9,6 +9,7 @@
 #include "report/MessageSequenceDiagram.hpp"
 #include "report/Mermaid.hpp"
 #include "report/Table.hpp"
+#include "report/Histogram.hpp"
 #include "report/Parser.hpp"
 
 using namespace report;
@@ -36,6 +37,7 @@ bool Parser::is_type_valid(const var::String class_type) const {
 			|| class_type == MessageSequenceDiagram::get_class_type()
 			|| class_type == Katex::get_class_type()
 			|| class_type == Csv::get_class_type()
+			|| class_type == Histogram::get_class_type()
 			|| class_type == Table::get_class_type()
 			|| class_type == "";
 }
@@ -152,6 +154,8 @@ int Parser::create_report(){
 				generate_csv_chart(file, data);
 			} else if( data.type() == Table::get_class_type() ){
 				generate_csv_table(file, data);
+			} else if( data.type() == Histogram::get_class_type() ){
+				generate_histogram_chart(file, data);
 			} else {
 				generate_passthrough(file, data);
 			}
@@ -208,6 +212,7 @@ int Parser::generate_csv_table(const fs::File * output, const IntermediateData &
 	{
 		String line = "|";
 		for(const String& item: header_list){
+			MCU_UNUSED_ARGUMENT(item);
 			line +=  "-------|";
 		}
 		line += "\n";
@@ -291,6 +296,62 @@ int Parser::generate_csv_chart(const fs::File * output, const IntermediateData &
 										 .set_step_size(0.1f))
 					.set_scale_label(
 						ChartJsScaleLabel().set_display(true).set_label(header_list.at(0))))
+				.append_y_axis(
+					ChartJsAxis()
+					.set_type(ChartJsAxis::type_linear)
+					.set_display(true)))
+			.set_legend(ChartJsLegend().set_display(true))
+			.set_title(ChartJsTitle().set_display(true).set_text(data.name() + "(" + data.type() +")"));
+
+	output->write("\n\n**" + data.name() + "**\n\n```chartjs\n");
+	output->write(JsonDocument().stringify(chart.to_object()));
+	output->write("\n```\n\n");
+
+	return 0;
+}
+
+int Parser::generate_histogram_chart(const fs::File * output, const IntermediateData & data){
+	//no data here
+	if( data.entry_list().count() < 1 ){
+		output->write("> No data is available\n\n");
+		return 0;
+	}
+
+	StringList header_list = data.entry_list().front().split(",");
+
+	if( header_list.count() < 1 ){
+		output->write("> No data is available\n\n");
+		return 0;
+	}
+
+	ChartJs chart;
+	chart.set_type(ChartJs::type_bar);
+	chart.data().label_list() = header_list;
+
+
+	for(u32 i=1; i < data.entry_list().count(); i++){
+		ChartJsDataSet data_set;
+		data_set
+				.set_label(data.name())
+				.set_border_color(ChartJsColor::get_standard(i).set_alpha(255))
+				.set_background_color(ChartJsColor::get_standard(i).set_alpha(128));
+		StringList value_list = data.entry_list().at(i).split(",");
+
+		for(const String& value: value_list){
+			data_set.append(JsonString(value));
+		}
+		chart.data().append(data_set);
+	}
+
+	chart.options()
+			.set_scales(
+				ChartJsScales()
+				.append_x_axis(
+					ChartJsAxis()
+					.set_display(true)
+					.set_type(ChartJsAxis::type_category)
+					.set_scale_label(
+						ChartJsScaleLabel().set_display(true).set_label("bin")))
 				.append_y_axis(
 					ChartJsAxis()
 					.set_type(ChartJsAxis::type_linear)

@@ -56,6 +56,7 @@ private:
 	Parser& parse_line(const var::String & input);
 	int generate_csv_chart(const fs::File * output, const IntermediateData & data);
 	int generate_csv_table(const fs::File * output, const IntermediateData & data);
+	int generate_histogram_chart(const fs::File * output, const IntermediateData & data);
 	int generate_passthrough(const fs::File * output, const IntermediateData & data);
 	int generate_raw(const fs::File * output, const IntermediateData & data);
 

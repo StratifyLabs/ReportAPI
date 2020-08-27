@@ -16,7 +16,6 @@ MermaidGraph::MermaidGraph(const Options & options) :
 	Mermaid(Mermaid::Options().set_name(options.name()).set_diagram("graph " + options.direction())){
 }
 
-
 MermaidNode::MermaidNode(const var::String & text, enum shapes shape){
 	switch(shape){
 		case shape_square:
@@ -68,7 +67,7 @@ var::String MermaidGraph::get_link_string(enum links link){
 		case link_dotted: return "-.->";
 		case link_thick: return "==>";
 	}
-
+	return "-->";
 }
 
 MermaidGraph& MermaidGraph::transition(

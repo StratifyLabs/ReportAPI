@@ -6,6 +6,7 @@ namespace report{}
 #include "report/Writer.hpp"
 #include "report/Parser.hpp"
 #include "report/Csv.hpp"
+#include "report/Histogram.hpp"
 #include "report/Mermaid.hpp"
 #include "report/Table.hpp"
 
