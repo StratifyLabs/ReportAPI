@@ -2,7 +2,7 @@
    "description": "Please add a brief description of your application.",
    "github": "",
    "name": "ReportDemo",
-   "permissions": "private",
+	 "permissions": "public",
    "publisher": "",
    "type": "app",
    "uid": "9cQyOTk3fZXOuMtPyf5j9X4H4b83",
