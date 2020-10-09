@@ -1,67 +1,61 @@
 #ifndef REPORTAPI_REPORT_PARSER_HPP
 #define REPORTAPI_REPORT_PARSER_HPP
 
-#include <sapi/var/Vector.hpp>
-#include <sapi/var/String.hpp>
-#include <sapi/fs/File.hpp>
+#include <fs/File.hpp>
+#include <var/String.hpp>
+#include <var/Vector.hpp>
 
 namespace report {
 
 class Parser {
 public:
+  class Options {
+    API_AC(Options, var::String, path); // path to a directory or file
+  };
 
-	class Options {
-		API_AC(Options,var::String,path); //path to a directory or file
-	};
+  Parser(const Options &options);
 
-	Parser(const Options & options);
+  Parser &parse(const var::String &input);
 
-	Parser& parse(const var::String & input);
-
-	int create_report();
-
+  int create_report();
 
 private:
+  class IntermediateData {
+  public:
+    bool operator==(const IntermediateData &a) const {
+      return type() == a.type() && name() == a.name();
+    }
 
-	class IntermediateData {
-	public:
+    var::String get_file_path(const var::String &directory_path) {
+      return directory_path + "/" + type() + "_" + name() + ".txt";
+    }
 
-		bool operator == (const IntermediateData & a) const {
-			return type() == a.type() && name() == a.name();
-		}
+  private:
+    API_AC(IntermediateData, var::String, type);
+    API_AC(IntermediateData, var::String, name);
+    API_AC(IntermediateData, var::StringList, entry_list);
+  };
 
-		var::String get_file_path(const var::String & directory_path){
-			return directory_path + "/" + type() + "_" + name() + ".txt";
-		}
+  API_RAB(Parser, valid, false);       // used if path is a empty
+  API_AC(Parser, var::String, output); // used if path is a empty
+  var::Vector<IntermediateData>
+    m_intermediate_data_list; // used if path is a file or empty
+  var::String m_directory_path;
+  var::String m_file_name;
+  var::String m_partial_line;
 
-	private:
-		API_AC(IntermediateData,var::String,type);
-		API_AC(IntermediateData,var::String,name);
-		API_AC(IntermediateData,var::StringList,entry_list);
-	};
+  bool is_use_intermediate_data() const { return m_directory_path.is_empty(); }
 
-	API_RAB(Parser,valid,false); //used if path is a empty
-	API_AC(Parser,var::String,output); //used if path is a empty
-	var::Vector<IntermediateData> m_intermediate_data_list; //used if path is a file or empty
-	var::String m_directory_path;
-	var::String m_file_name;
-	var::String m_partial_line;
+  bool is_type_valid(const var::String class_type) const;
 
-	bool is_use_intermediate_data() const {
-		return m_directory_path.is_empty();
-	}
-
-	bool is_type_valid(const var::String class_type) const;
-
-	Parser& parse_line(const var::String & input);
-	int generate_csv_chart(const fs::File * output, const IntermediateData & data);
-	int generate_csv_table(const fs::File * output, const IntermediateData & data);
-	int generate_histogram_chart(const fs::File * output, const IntermediateData & data);
-	int generate_passthrough(const fs::File * output, const IntermediateData & data);
-	int generate_raw(const fs::File * output, const IntermediateData & data);
-
+  Parser &parse_line(const var::String &input);
+  int generate_csv_chart(fs::File *output, const IntermediateData &data);
+  int generate_csv_table(fs::File *output, const IntermediateData &data);
+  int generate_histogram_chart(fs::File *output, const IntermediateData &data);
+  int generate_passthrough(fs::File *output, const IntermediateData &data);
+  int generate_raw(fs::File *output, const IntermediateData &data);
 };
 
-}
+} // namespace report
 
 #endif // REPORTAPI_REPORT_PARSER_HPP

@@ -59,6 +59,8 @@ target_link_libraries(${RELEASE_TARGET}
 	VarAPI_release_v7m
 	)
 
+
+
 option(BUILD_DEBUG "Build debug version of library" OFF)
 if(BUILD_DEBUG)
 sos_sdk_library_target(DEBUG ${LOCAL_NAME} "${LIB_OPTION}" debug ${SOS_ARCH})
@@ -70,8 +72,5 @@ endif()
 sos_sdk_library("${RELEASE_OPTIONS}")
 #sos_sdk_library_add_arch_targets("${RELEASE_OPTIONS}" ${SOS_ARCH} VarAPI_release)
 
-
-
-#/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/bin/arm-none-eabi-g++  -DMCU_SOS_GIT_HASH=9dc45b5 -D__SOS_SDK_OPTION_EMPTY -D__StratifyOS__ -D___release -D__v7m -I/Users/tgil/gitv4/ChartAPI/include -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/API -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/VarAPI  -fno-exceptions -fno-unwind-tables -fno-rtti   -Os -mthumb -ffunction-sections -fdata-sections -fomit-frame-pointer -march=armv7-m -DARM_MATH_CM3=1 -std=gnu++17 -o CMakeFiles/ChartAPI_release_v7m.dir/src/ChartJs.cpp.obj -c /Users/tgil/gitv4/ChartAPI/src/ChartJs.cpp
-#/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/bin/arm-none-eabi-g++  -DMCU_SOS_GIT_HASH=9dc45b5 -D__SOS_SDK_OPTION_EMPTY -D__StratifyOS__ -D___release -D__v7m -I/Users/tgil/gitv4/ChartAPI/include -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/API -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/VarAPI  -fno-exceptions -fno-unwind-tables -fno-rtti   -Os -mthumb -ffunction-sections -fdata-sections -fomit-frame-pointer -march=armv7-m -DARM_MATH_CM3=1 -std=gnu++17 -o CMakeFiles/ChartAPI_release_v7m.dir/src/ChartJs.cpp.obj -c /Users/tgil/gitv4/ChartAPI/src/ChartJs.cpp
+install(DIRECTORY include/ DESTINATION include/${LOCAL_NAME} PATTERN CMakelists.txt EXCLUDE)
 

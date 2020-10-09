@@ -3,19 +3,15 @@
 
 #include "Writer.hpp"
 
-
 namespace report {
 
-class Katex : public Writer
-{
+class Katex : public Writer {
 public:
-	Katex();
+  Katex();
 
-	static var::String get_class_type(){
-		return "kt";
-	}
+  static var::StringView get_class_type() { return "kt"; }
 };
 
-}
+} // namespace report
 
 #endif // REPORTAPI_REPORT_KATEX_HPP

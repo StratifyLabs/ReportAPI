@@ -5,18 +5,13 @@
 
 namespace report {
 
-
-class Flowchart : public Writer
-{
+class Flowchart : public Writer {
 public:
-	Flowchart();
+  Flowchart();
 
-	static var::String get_class_type(){
-		return "fc";
-	}
-
+  static var::StringView get_class_type() { return "fc"; }
 };
 
-}
+} // namespace report
 
 #endif // REPORTAPI_REPORT_FLOWCHART_HPP

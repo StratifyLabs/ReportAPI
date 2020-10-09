@@ -12,8 +12,9 @@ namespace report {
 class PosixWriter {
 public:
   static int write_function(void *context, const char *buffer, int nbyte) {
-    return reinterpret_cast<const PosixWriter *>(context)->write_to_file(buffer,
-                                                                         nbyte);
+    return reinterpret_cast<const PosixWriter *>(context)->write_to_file(
+      buffer,
+      nbyte);
   }
 
 private:
@@ -27,35 +28,35 @@ private:
 class FileWriter {
 public:
   static int write_function(void *context, const char *buffer, int nbyte) {
-    return reinterpret_cast<const FileWriter *>(context)->write_to_file(buffer,
-                                                                        nbyte);
+    return reinterpret_cast<FileWriter *>(context)->write_to_file(
+      buffer,
+      nbyte);
   }
 
 private:
   API_AC(FileWriter, fs::File, file);
-  int write_to_file(const char *buffer, int nbyte) const {
+  int write_to_file(const char *buffer, int nbyte) {
     if (file().fileno() < 0) {
       return -1;
     }
-    return file().write(
-        var::Blob(var::Blob::ReadOnlyBuffer(buffer), var::Blob::Size(nbyte)));
+    return file().write(var::View(buffer, nbyte)).status().value();
   }
 };
 
 class DataFileWriter {
 public:
-  DataFileWriter() : m_data_file(fs::OpenFlags().append_read_write()) {}
+  DataFileWriter() : m_data_file(fs::OpenMode().append_read_write()) {}
 
   static int write_function(void *context, const char *buffer, int nbyte) {
-    return reinterpret_cast<const DataFileWriter *>(context)->write_to_file(
-        buffer, nbyte);
+    return reinterpret_cast<DataFileWriter *>(context)->write_to_file(
+      buffer,
+      nbyte);
   }
 
 private:
   API_AC(DataFileWriter, fs::DataFile, data_file);
-  int write_to_file(const char *buffer, int nbyte) const {
-    return data_file().write(
-        var::Blob(var::Blob::ReadOnlyBuffer(buffer), var::Blob::Size(nbyte)));
+  int write_to_file(const char *buffer, int nbyte) {
+    return data_file().write(var::View(buffer, nbyte)).status().value();
   }
 };
 
@@ -98,11 +99,13 @@ protected:
   int write(const char *buffer, int nbyte) const {
     if (m_write_function) {
       int result = 0;
-      result +=
-          m_write_function(m_context, prefix().cstring(), prefix().length());
+      result
+        += m_write_function(m_context, prefix().cstring(), prefix().length());
       result += m_write_function(m_context, buffer, nbyte);
-      result += m_write_function(m_context, terminator().cstring(),
-                                 terminator().length());
+      result += m_write_function(
+        m_context,
+        terminator().cstring(),
+        terminator().length());
       return result;
     }
     return -1;

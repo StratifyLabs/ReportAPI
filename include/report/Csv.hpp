@@ -7,31 +7,23 @@ namespace report {
 
 class Csv : public WriterAccess<Csv> {
 public:
-	class Options {
-		API_AC(Options,var::String,name);
-		API_AC(Options,var::String,header);
-	};
+  class Options {
+    API_AC(Options, var::String, name);
+    API_AC(Options, var::String, header);
+  };
 
+  static var::StringView get_class_type() { return "csv"; }
 
-	static var::String get_class_type(){
-		return "csv";
-	}
+  explicit Csv(const Options &options);
 
-	explicit Csv(const Options & options);
-
-	Csv& write_row(const var::String & value){
-		write(value);
-		return *this;
-	}
-
-
+  Csv &write_row(const var::String &value) {
+    write(value);
+    return *this;
+  }
 
 private:
-
-
-
 };
 
-}
+} // namespace report
 
 #endif // REPORTAPI_REPORT_CSV_HPP

@@ -7,26 +7,23 @@ namespace report {
 
 class Table : public Writer {
 public:
-	Table();
+  Table();
 
-	class Options {
-		API_AC(Options,var::String,name);
-		API_AC(Options,var::String,header);
-	};
+  class Options {
+    API_AC(Options, var::String, name);
+    API_AC(Options, var::String, header);
+  };
 
-	static var::String get_class_type(){
-		return "tab";
-	}
+  static var::StringView get_class_type() { return "tab"; }
 
-	explicit Table(const Options & options);
+  explicit Table(const Options &options);
 
-	Table& write_row(const var::String & value){
-		write(value);
-		return *this;
-	}
-
+  Table &write_row(const var::String &value) {
+    write(value);
+    return *this;
+  }
 };
 
-}
+} // namespace report
 
 #endif // REPORTAPI_REPORT_TABLE_HPP
