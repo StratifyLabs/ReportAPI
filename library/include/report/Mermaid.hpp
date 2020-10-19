@@ -67,7 +67,7 @@ public:
     const MermaidNode &from,
     enum links link_arrow,
     const MermaidNode &to,
-    const var::String &message);
+    const var::StringView &message);
 
 private:
   u32 m_sequence_count;
@@ -88,7 +88,7 @@ public:
         m_call_stack.top(),
         MermaidGraph::link_arrow,
         node,
-        var::String::number(m_transition_counter++));
+        var::NumberString(m_transition_counter++));
     }
     m_call_stack.push(node);
   }
@@ -99,7 +99,7 @@ public:
         m_call_stack.top(),
         report::MermaidGraph::link_arrow,
         MermaidNode(data, MermaidNode::shape_cylinder),
-        var::String::number(m_transition_counter++));
+        var::NumberString(m_transition_counter++));
     }
   }
 

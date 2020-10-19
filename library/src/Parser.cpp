@@ -1,5 +1,6 @@
 #include <ChartAPI/chart.hpp>
 #include <fs.hpp>
+#include <json.hpp>
 #include <var.hpp>
 
 #include "report/Csv.hpp"
@@ -30,7 +31,7 @@ Parser::Parser(const Options &options) {
   }
 }
 
-bool Parser::is_type_valid(const var::String class_type) const {
+bool Parser::is_type_valid(const var::StringView class_type) const {
   return class_type == Mermaid::get_class_type()
          || class_type == Flowchart::get_class_type()
          || class_type == MessageSequenceDiagram::get_class_type()
@@ -45,7 +46,7 @@ Parser &Parser::parse(const var::String &input) {
     return *this;
   }
 
-  StringList line_list = input.split("\r\n");
+  StringViewList line_list = input.split("\r\n");
   u32 count = line_list.count();
 
   if (input.back() == '\n' || count > 1) {
@@ -55,7 +56,7 @@ Parser &Parser::parse(const var::String &input) {
 
   if (input.back() != '\n') {
     // last line is partial
-    m_partial_line = line_list.back();
+    m_partial_line = String(line_list.back());
     count--;
   }
 
@@ -71,7 +72,7 @@ Parser &Parser::parse_line(const var::String &line) {
     return *this;
   }
 
-  StringList input_list
+  StringViewList input_list
     = Tokenizer(
         line,
         Tokenizer::Construct().set_delimeters(":").set_maximum_delimeter_count(
@@ -82,9 +83,9 @@ Parser &Parser::parse_line(const var::String &line) {
     return *this;
   }
 
-  String name;
-  String type;
-  String value;
+  StringView name;
+  StringView type;
+  StringView value;
 
   if (input_list.count() != 3 || !is_type_valid(input_list.at(0))) {
 
@@ -99,22 +100,26 @@ Parser &Parser::parse_line(const var::String &line) {
     value = input_list.at(2);
   }
 
-  IntermediateData data = IntermediateData().set_name(name).set_type(type);
+  IntermediateData data
+    = IntermediateData().set_name(String(name)).set_type(String(type));
 
   if (is_use_intermediate_data()) {
-    u32 offset = m_intermediate_data_list.find(data);
+
+    const size_t offset = m_intermediate_data_list.find_offset(data);
     if (offset == m_intermediate_data_list.count()) {
       // data was not found -- add it to the end
       m_intermediate_data_list.push_back(data);
     }
-    m_intermediate_data_list.at(offset).entry_list().push_back(value);
+
+    m_intermediate_data_list.at(offset).entry_list().push_back(String(value));
+
   } else {
     // write the entry to a txt file
     String path = data.get_file_path(m_directory_path);
     if (FileSystem().exists(path)) {
       File(path, OpenMode::append_write_only()).write(value);
     } else {
-      File::create(path, File::IsOverwrite(false)).write(value);
+      File(File::IsOverwrite(false), path).write(value);
     }
   }
 
@@ -123,29 +128,25 @@ Parser &Parser::parse_line(const var::String &line) {
 
 int Parser::create_report() {
 
-  File output_file;
+  const String output_file_path
+    = m_directory_path.is_empty()
+        ? m_file_name
+        : m_directory_path + "/" + m_file_name + ".md";
+
   DataFile output_data_file(OpenMode::append_read_write());
 
-  File *file;
-  if (m_file_name.is_empty()) {
+  File output_file = File(File::IsOverwrite::no, output_file_path);
+
+  const File *file;
+  if (output_file.is_error()) {
+    output_file.reset_error();
     file = &output_data_file;
   } else {
     file = &output_file;
-    String output_file_path = m_directory_path.is_empty()
-                                ? m_file_name
-                                : m_directory_path + "/" + m_file_name + ".md";
-
-    output_file = File::create(output_file_path, File::IsOverwrite::no);
-
-    if (output_file.status().is_error()) {
-      return -1;
-    }
   }
 
   if (is_use_intermediate_data()) {
-
     for (const IntermediateData &data : m_intermediate_data_list) {
-
       if (data.type() == Csv::get_class_type()) {
         generate_csv_chart(file, data);
       } else if (data.type() == Table::get_class_type()) {
@@ -155,7 +156,6 @@ int Parser::create_report() {
       } else {
         generate_passthrough(file, data);
       }
-
       output_file.write("\n");
     }
 
@@ -169,7 +169,7 @@ int Parser::create_report() {
 }
 
 int Parser::generate_passthrough(
-  fs::File *output,
+  const fs::File *output,
   const IntermediateData &data) {
   // most formats are just passthrough data
 
@@ -185,18 +185,20 @@ int Parser::generate_passthrough(
   return 0;
 }
 
-int Parser::generate_csv_table(fs::File *output, const IntermediateData &data) {
+int Parser::generate_csv_table(
+  const fs::File *output,
+  const IntermediateData &data) {
 
   if (data.entry_list().count() == 0) {
     output->write(StringView("> No data is available\n\n"));
     return 0;
   }
 
-  StringList header_list = data.entry_list().front().split(",");
+  const StringViewList header_list = data.entry_list().front().split(",");
 
   {
     String line = String("| ");
-    for (const String &item : header_list) {
+    for (const auto item : header_list) {
       line += item + " |";
     }
     line += "\n";
@@ -205,7 +207,7 @@ int Parser::generate_csv_table(fs::File *output, const IntermediateData &data) {
 
   {
     String line = String("|");
-    for (const String &item : header_list) {
+    for (const auto item : header_list) {
       MCU_UNUSED_ARGUMENT(item);
       line += "-------|";
     }
@@ -215,8 +217,8 @@ int Parser::generate_csv_table(fs::File *output, const IntermediateData &data) {
 
   for (u32 i = 1; i < data.entry_list().count(); i++) {
     String line = String("|");
-    StringList item_list = data.entry_list().at(i).split(",");
-    for (const String &item : item_list) {
+    const StringViewList item_list = data.entry_list().at(i).split(",");
+    for (const auto item : item_list) {
       line += item + " |";
     }
     line += "\n\n";
@@ -226,7 +228,9 @@ int Parser::generate_csv_table(fs::File *output, const IntermediateData &data) {
   return 0;
 }
 
-int Parser::generate_csv_chart(fs::File *output, const IntermediateData &data) {
+int Parser::generate_csv_chart(
+  const fs::File *output,
+  const IntermediateData &data) {
   // csv is not trivially handled -- needs some parsing
 
   // no data here
@@ -235,7 +239,7 @@ int Parser::generate_csv_chart(fs::File *output, const IntermediateData &data) {
     return 0;
   }
 
-  StringList header_list = data.entry_list().front().split(",");
+  StringViewList header_list = data.entry_list().front().split(",");
 
   if (header_list.count() < 2) {
     output->write(StringView("> No data is available\n\n"));
@@ -252,21 +256,21 @@ int Parser::generate_csv_chart(fs::File *output, const IntermediateData &data) {
 
     ChartJsDataSet data_set;
 
-    data_set.set_label(header_list.at(i))
+    data_set.set_label(String(header_list.at(i)))
       .set_border_color(ChartJsColor::get_standard(color++).set_alpha(128))
       .set_background_color(ChartJsColor().set_alpha(0));
 
     for (u32 j = 1; j < data.entry_list().count(); j++) {
-      StringList data_list = data.entry_list().at(j).split(",");
+      const StringViewList data_list = data.entry_list().at(j).split(",");
       if (x_extrema.at(0).is_empty()) {
-        x_extrema.at(0) = data_list.at(0);
+        x_extrema.at(0) = String(data_list.at(0));
       }
 
-      x_extrema.at(1) = data_list.at(0);
+      x_extrema.at(1) = String(data_list.at(0));
 
       data_set.append(ChartJsStringDataPoint()
-                        .set_x(data_list.at(0))
-                        .set_y(data_list.at(i))
+                        .set_x(String(data_list.at(0)))
+                        .set_y(String(data_list.at(i)))
                         .to_object());
     }
 
@@ -285,7 +289,7 @@ int Parser::generate_csv_chart(fs::File *output, const IntermediateData &data) {
                          .set_maximum(x_extrema.at(1).to_float())
                          .set_step_size(0.1f))
             .set_scale_label(ChartJsScaleLabel().set_display(true).set_label(
-              header_list.at(0))))
+              String(header_list.at(0)))))
         .append_y_axis(
           ChartJsAxis().set_type(ChartJsAxis::type_linear).set_display(true)))
     .set_legend(ChartJsLegend().set_display(true))
@@ -293,14 +297,14 @@ int Parser::generate_csv_chart(fs::File *output, const IntermediateData &data) {
       data.name() + "(" + data.type() + ")"));
 
   output->write(String("\n\n**") + data.name() + "**\n\n```chartjs\n");
-  output->write(JsonDocument().stringify(chart.to_object()));
+  output->write(View(json::JsonDocument().stringify(chart.to_object())));
   output->write("\n```\n\n");
 
   return 0;
 }
 
 int Parser::generate_histogram_chart(
-  fs::File *output,
+  const fs::File *output,
   const IntermediateData &data) {
   // no data here
   if (data.entry_list().count() < 1) {
@@ -308,8 +312,7 @@ int Parser::generate_histogram_chart(
     return 0;
   }
 
-  StringList header_list = data.entry_list().front().split(",");
-
+  StringViewList header_list = data.entry_list().front().split(",");
   if (header_list.count() < 1) {
     output->write(StringView("> No data is available\n\n"));
     return 0;
@@ -317,16 +320,18 @@ int Parser::generate_histogram_chart(
 
   ChartJs chart;
   chart.set_type(ChartJs::type_bar);
-  chart.data().label_list() = header_list;
+  for (const auto value : header_list) {
+    chart.data().label_list().push_back(String(value));
+  }
 
   for (u32 i = 1; i < data.entry_list().count(); i++) {
     ChartJsDataSet data_set;
     data_set.set_label(data.name())
       .set_border_color(ChartJsColor::get_standard(i).set_alpha(255))
       .set_background_color(ChartJsColor::get_standard(i).set_alpha(128));
-    StringList value_list = data.entry_list().at(i).split(",");
+    StringViewList value_list = data.entry_list().at(i).split(",");
 
-    for (const String &value : value_list) {
+    for (const auto value : value_list) {
       data_set.append(JsonString(value));
     }
     chart.data().append(data_set);
@@ -348,7 +353,7 @@ int Parser::generate_histogram_chart(
       data.name() + "(" + data.type() + ")"));
 
   output->write(String("\n\n**") + data.name() + "**\n\n```chartjs\n");
-  output->write(JsonDocument().stringify(chart.to_object()));
+  output->write(View(json::JsonDocument().stringify(chart.to_object())));
   output->write(String("\n```\n\n"));
 
   return 0;

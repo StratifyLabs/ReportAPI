@@ -46,14 +46,18 @@ private:
 
   bool is_use_intermediate_data() const { return m_directory_path.is_empty(); }
 
-  bool is_type_valid(const var::String class_type) const;
+  bool is_type_valid(const var::StringView class_type) const;
 
   Parser &parse_line(const var::String &input);
-  int generate_csv_chart(fs::File *output, const IntermediateData &data);
-  int generate_csv_table(fs::File *output, const IntermediateData &data);
-  int generate_histogram_chart(fs::File *output, const IntermediateData &data);
-  int generate_passthrough(fs::File *output, const IntermediateData &data);
-  int generate_raw(fs::File *output, const IntermediateData &data);
+  int generate_csv_chart(const fs::File *output, const IntermediateData &data);
+  int generate_csv_table(const fs::File *output, const IntermediateData &data);
+  int generate_histogram_chart(
+    const fs::File *output,
+    const IntermediateData &data);
+  int generate_passthrough(
+    const fs::File *output,
+    const IntermediateData &data);
+  int generate_raw(const fs::File *output, const IntermediateData &data);
 };
 
 } // namespace report

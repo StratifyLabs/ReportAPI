@@ -34,18 +34,12 @@ public:
   }
 
 private:
-  API_AC(FileWriter, fs::File, file);
-  int write_to_file(const char *buffer, int nbyte) {
-    if (file().fileno() < 0) {
-      return -1;
-    }
-    return file().write(var::View(buffer, nbyte)).status().value();
-  }
+  int write_to_file(const char *buffer, int nbyte) { return 0; }
 };
 
 class DataFileWriter {
 public:
-  DataFileWriter() : m_data_file(fs::OpenMode().append_read_write()) {}
+  DataFileWriter() {}
 
   static int write_function(void *context, const char *buffer, int nbyte) {
     return reinterpret_cast<DataFileWriter *>(context)->write_to_file(
@@ -54,10 +48,7 @@ public:
   }
 
 private:
-  API_AC(DataFileWriter, fs::DataFile, data_file);
-  int write_to_file(const char *buffer, int nbyte) {
-    return data_file().write(var::View(buffer, nbyte)).status().value();
-  }
+  int write_to_file(const char *buffer, int nbyte) { return 0; }
 };
 
 class Writer {
@@ -87,8 +78,8 @@ public:
 
   var::String get_prefix() const { return type() + ":" + name() + ":"; }
 
-  var::String get_unique_name() const {
-    return chrono::Clock::get_time().get_unique_string();
+  chrono::ClockTime::UniqueString get_unique_name() const {
+    return chrono::ClockTime::get_unique_string();
   }
 
 protected:

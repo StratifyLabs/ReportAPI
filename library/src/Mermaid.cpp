@@ -20,43 +20,43 @@ MermaidGraph::MermaidGraph(const Options &options)
 MermaidNode::MermaidNode(var::StringView text, enum shapes shape) {
   switch (shape) {
   case shape_square:
-    m_node = var::String().format("n%d[%s]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[%s]", m_count++, text);
     return;
   case shape_round:
-    m_node = var::String().format("n%d(%s)", m_count++, text.cstring());
+    m_node = var::String().format("n%d(%s)", m_count++, text);
     return;
   case shape_stadium:
-    m_node = var::String().format("n%d([%s])", m_count++, text.cstring());
+    m_node = var::String().format("n%d([%s])", m_count++, text);
     return;
   case shape_subroutine:
-    m_node = var::String().format("n%d[[%s]]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[[%s]]", m_count++, text);
     return;
   case shape_cylinder:
-    m_node = var::String().format("n%d[(%s)]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[(%s)]", m_count++, text);
     return;
   case shape_circle:
-    m_node = var::String().format("n%d((%s))", m_count++, text.cstring());
+    m_node = var::String().format("n%d((%s))", m_count++, text);
     return;
   case shape_asymmetric:
-    m_node = var::String().format("n%d>%s]", m_count++, text.cstring());
+    m_node = var::String().format("n%d>%s]", m_count++, text);
     return;
   case shape_rhombus:
-    m_node = var::String().format("n%d{%s}", m_count++, text.cstring());
+    m_node = var::String().format("n%d{%s}", m_count++, text);
     return;
   case shape_hexagon:
-    m_node = var::String().format("n%d{{%s}}", m_count++, text.cstring());
+    m_node = var::String().format("n%d{{%s}}", m_count++, text);
     return;
   case shape_parallelogram:
-    m_node = var::String().format("n%d[/%s/]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[/%s/]", m_count++, text);
     return;
   case shape_parallelogram_alternate:
-    m_node = var::String().format("n%d[\\%s\\]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[\\%s\\]", m_count++, text);
     return;
   case shape_trapezoid:
-    m_node = var::String().format("n%d[/%s\\]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[/%s\\]", m_count++, text);
     return;
   case shape_trapezoid_alternate:
-    m_node = var::String().format("n%d[\\%s/]", m_count++, text.cstring());
+    m_node = var::String().format("n%d[\\%s/]", m_count++, text);
     return;
   }
 }
@@ -79,7 +79,7 @@ MermaidGraph &MermaidGraph::transition(
   const MermaidNode &from,
   enum links link_arrow,
   const MermaidNode &to,
-  const var::String &message) {
+  const var::StringView &message) {
   write(
     var::String("  ") + from.node() + get_link_string(link_arrow)
     + (message.is_empty() ? var::String() : (var::String("|") + message + "|") + to.node()));

@@ -4,7 +4,7 @@ using namespace report;
 
 Table::Table(const Options &options) {
   if (options.name().is_empty()) {
-    set_name(get_unique_name());
+    set_name(var::String(get_unique_name().cstring()));
   } else {
     set_name(options.name());
   }
