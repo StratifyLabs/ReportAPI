@@ -21,11 +21,11 @@ Parser::Parser(const Options &options) {
   } else {
     FileInfo info = FileSystem().get_info(options.path());
     if (info.is_directory()) {
-      m_file_name = Path(options.path()).name() + ".md";
-      m_directory_path = options.path();
+      m_file_name = (Path(options.path()).name() + ".md");
+      m_directory_path = String(options.path());
       m_is_valid = true;
     } else {
-      m_file_name = options.path();
+      m_file_name = String(options.path());
       m_is_valid = true;
     }
   }
@@ -269,8 +269,8 @@ int Parser::generate_csv_chart(
       x_extrema.at(1) = String(data_list.at(0));
 
       data_set.append(ChartJsStringDataPoint()
-                        .set_x(String(data_list.at(0)))
-                        .set_y(String(data_list.at(i)))
+                        .set_x(data_list.at(0))
+                        .set_y(data_list.at(i))
                         .to_object());
     }
 

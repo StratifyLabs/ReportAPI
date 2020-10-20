@@ -10,7 +10,7 @@ namespace report {
 class Parser {
 public:
   class Options {
-    API_AC(Options, var::String, path); // path to a directory or file
+    API_AC(Options, var::StringView, path); // path to a directory or file
   };
 
   Parser(const Options &options);
