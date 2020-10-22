@@ -21,7 +21,7 @@ Parser::Parser(const Options &options) {
   } else {
     FileInfo info = FileSystem().get_info(options.path());
     if (info.is_directory()) {
-      m_file_name = (Path(options.path()).name() + ".md");
+      m_file_name = Path::name(options.path()) + ".md";
       m_directory_path = String(options.path());
       m_is_valid = true;
     } else {
@@ -115,7 +115,7 @@ Parser &Parser::parse_line(const var::String &line) {
 
   } else {
     // write the entry to a txt file
-    String path = data.get_file_path(m_directory_path);
+    PathString path = data.get_file_path(m_directory_path);
     if (FileSystem().exists(path)) {
       File(path, OpenMode::append_write_only()).write(value);
     } else {

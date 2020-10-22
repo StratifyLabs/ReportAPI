@@ -83,8 +83,8 @@ public:
   }
 
 protected:
-  int write(const var::String &str) const {
-    return write(str.cstring(), str.length());
+  int write(const var::StringView str) const {
+    return write(str.data(), str.length());
   }
 
   int write(const char *buffer, int nbyte) const {

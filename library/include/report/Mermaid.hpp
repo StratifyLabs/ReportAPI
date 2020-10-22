@@ -93,7 +93,7 @@ public:
     m_call_stack.push(node);
   }
 
-  void data(const var::String &data) {
+  void data(const var::StringView data) {
     if (m_call_stack.count()) {
       m_mermaid_graph.transition(
         m_call_stack.top(),

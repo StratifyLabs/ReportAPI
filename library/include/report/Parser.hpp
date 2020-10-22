@@ -2,7 +2,7 @@
 #define REPORTAPI_REPORT_PARSER_HPP
 
 #include <fs/File.hpp>
-#include <var/String.hpp>
+#include <var/StackString.hpp>
 #include <var/Vector.hpp>
 
 namespace report {
@@ -26,8 +26,11 @@ private:
       return type() == a.type() && name() == a.name();
     }
 
-    var::String get_file_path(const var::String &directory_path) {
-      return directory_path + "/" + type() + "_" + name() + ".txt";
+    var::PathString get_file_path(const var::StringView directory_path) {
+      return (var::PathString(directory_path) / type().string_view())
+        .append("_")
+        .append(name().string_view())
+        .append(".txt");
     }
 
   private:

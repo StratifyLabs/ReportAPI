@@ -16,7 +16,7 @@ public:
 
   explicit Csv(const Options &options);
 
-  Csv &write_row(const var::String &value) {
+  Csv &write_row(const var::StringView value) {
     write(value);
     return *this;
   }
