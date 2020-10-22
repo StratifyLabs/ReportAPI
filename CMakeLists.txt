@@ -8,10 +8,9 @@ set(CMAKE_MODULE_PATH ${SOS_SDK_PATH}/Tools/gcc/cmake)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_MODULE_PATH}/sos-toolchain.cmake)
 include(sos-sdk)
 
-include(targets/JsonAPI)
+include(targets/ChartAPI)
 
-set(LOCAL_NAME ReportAPI)
-project(${LOCAL_NAME} CXX)
+project(ReportAPI CXX)
 include(CTest)
 
 add_subdirectory(tests tests)

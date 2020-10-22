@@ -9,7 +9,7 @@ Histogram::Histogram(const Options &options) {
   write(options.labels());
 }
 
-Histogram &Histogram::write_row(const var::String &row) {
+Histogram &Histogram::write_row(const var::StringView row) {
   write(row);
   return *this;
 }

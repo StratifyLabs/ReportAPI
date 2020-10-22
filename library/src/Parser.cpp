@@ -41,7 +41,7 @@ bool Parser::is_type_valid(const var::StringView class_type) const {
          || class_type == Table::get_class_type() || class_type == "";
 }
 
-Parser &Parser::parse(const var::String &input) {
+Parser &Parser::parse(const var::StringView input) {
   if (input.length() == 0) {
     return *this;
   }
@@ -269,8 +269,8 @@ int Parser::generate_csv_chart(
       x_extrema.at(1) = String(data_list.at(0));
 
       data_set.append(ChartJsStringDataPoint()
-                        .set_x(data_list.at(0))
-                        .set_y(data_list.at(i))
+                        .set_x(var::String(data_list.at(0)))
+                        .set_y(var::String(data_list.at(i)))
                         .to_object());
     }
 

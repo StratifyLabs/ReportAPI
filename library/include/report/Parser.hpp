@@ -15,7 +15,7 @@ public:
 
   Parser(const Options &options);
 
-  Parser &parse(const var::String &input);
+  Parser &parse(const var::StringView input);
 
   int create_report();
 

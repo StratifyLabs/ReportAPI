@@ -1,7 +1,7 @@
 #ifndef REPORTAPI_REPORT_WRITER_HPP
 #define REPORTAPI_REPORT_WRITER_HPP
 
-#include <chrono/Clock.hpp>
+#include <chrono/ClockTime.hpp>
 #include <cstdio>
 #include <fs/File.hpp>
 #include <var/String.hpp>

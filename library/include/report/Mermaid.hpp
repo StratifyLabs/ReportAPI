@@ -77,7 +77,7 @@ private:
 
 class CallGraph {
 public:
-  explicit CallGraph(const var::String &name)
+  explicit CallGraph(const var::StringView name)
     : m_mermaid_graph(
       MermaidGraph::Options().set_name(name).set_direction("LR")) {}
 

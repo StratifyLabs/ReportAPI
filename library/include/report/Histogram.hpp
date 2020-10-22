@@ -16,7 +16,7 @@ public:
 
   static var::StringView get_class_type() { return "hist"; }
 
-  Histogram &write_row(const var::String &row);
+  Histogram &write_row(const var::StringView row);
 };
 
 } // namespace report
