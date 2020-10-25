@@ -59,9 +59,22 @@ void Parser::IntermediateData::generate(const fs::File &output) const {
     generate_csv_table(output);
   } else if (type() == Histogram::get_class_type()) {
     generate_histogram_chart(output);
+  } else if (type() == "mmd") {
+    generate_mermaid(output);
   } else {
     generate_passthrough(output);
   }
+}
+
+void Parser::IntermediateData::generate_mermaid(const fs::File &output) const {
+  output.write(String("**") + name() + "**\n\n").write("```mermaid\n");
+
+  for (const auto entry : entry_list()) {
+    output.write(content(entry));
+    output.write("\n");
+  }
+
+  output.write(String("```\n\n"));
 }
 
 void Parser::IntermediateData::generate_passthrough(
@@ -71,6 +84,7 @@ void Parser::IntermediateData::generate_passthrough(
 
   for (const auto entry : entry_list()) {
     output.write(content(entry));
+    output.write("\n");
   }
 
   output.write(String("```\n\n"));

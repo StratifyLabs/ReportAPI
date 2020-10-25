@@ -19,19 +19,21 @@ public:
   };
 
   MessageSequenceDiagram &set_participant(const var::StringView name) {
-    return set_value(var::PathString("participant").append(name));
+    return set_value(var::PathString("  participant ").append(name));
   }
 
   MessageSequenceDiagram &set_message(const MessageOptions &options) {
-    return set_value(var::PathString(options.source())
-                       .append("->")
+    return set_value(var::PathString("  ")
+                       .append(options.source())
+                       .append("-->")
                        .append(options.destination())
                        .append(":")
                        .append(options.message()));
   }
 
-  MessageSequenceDiagram &set_message_alt(const MessageOptions &options) {
-    return set_value(var::PathString(options.source())
+  MessageSequenceDiagram &set_message_arrow(const MessageOptions &options) {
+    return set_value(var::PathString("  ")
+                       .append(options.source())
                        .append("->>")
                        .append(options.destination())
                        .append(":")
@@ -39,7 +41,8 @@ public:
   }
 
   MessageSequenceDiagram &set_message_dotted(const MessageOptions &options) {
-    return set_value(var::PathString(options.source())
+    return set_value(var::PathString("  ")
+                       .append(options.source())
                        .append("-->")
                        .append(options.destination())
                        .append(":")

@@ -18,7 +18,7 @@ u32 Mermaid::Node::m_count = 0;
 
 Mermaid::Mermaid(printer::Printer &printer, const Construct &options) {
   set_prefix(generate_prefix(get_class_type(), options.name()));
-  printer.key(prefix(), options.diagram());
+  printer.object(prefix(), options.diagram());
 }
 
 MermaidGraph::MermaidGraph(
@@ -93,11 +93,13 @@ MermaidGraph &MermaidGraph::set_transition(
   Link link_arrow,
   const Node &to,
   const var::StringView message) {
+  API_ASSERT(prefix().is_empty() == false);
   return set_from(from).set_to(to).set_link(link_arrow).set_message(message);
 }
 
-var::KeyString MermaidGraph::get_transition_string() const {
-  return std::move(var::KeyString("  ")
+var::GeneralString MermaidGraph::get_transition_string() const {
+  API_ASSERT(prefix().is_empty() == false);
+  return std::move(var::GeneralString("  ")
                      .append(m_from.node())
                      .append(get_link_string(m_link))
                      .append(

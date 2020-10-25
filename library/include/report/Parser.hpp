@@ -64,6 +64,7 @@ private:
     void generate_csv_chart(const fs::File &output) const;
     void generate_csv_table(const fs::File &output) const;
     void generate_histogram_chart(const fs::File &output) const;
+    void generate_mermaid(const fs::File &output) const;
     void generate_passthrough(const fs::File &output) const;
     void generate_raw(const fs::File &output) const;
   };

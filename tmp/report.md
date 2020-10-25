@@ -1,3 +1,14 @@
+**callgraph**
+
+```mermaid
+graph LR
+  n0(execute_class_api_case)-->|0|n1(csv_case)
+  n0(execute_class_api_case)-->|1|n2(hist_case)
+  n0(execute_class_api_case)-->|2|n3(table_case)
+  n0(execute_class_api_case)-->|3|n4(mermaid_case)
+  n0(execute_class_api_case)-->|4|n9(parser_case)
+```
+
 
 
 **dummy**
@@ -667,4 +678,28 @@
 | -0.588 |0.809 |
 | -0.309 |0.951 |
 
+
+**mmd**
+
+```mermaid
+graph LR
+  n5(Home)-->n6(First)
+  n6(First)-.->n7(Second)
+  n7(Second) --- n8(Home)
+  n8(Home)==>n5(Home)
+```
+
+**msd**
+
+```mermaid
+sequenceDiagram
+  participant jane
+  participant sally
+  jane-->sally:hello
+  sally->>jane:hi
+  jane-->sally:how are you?
+  sally->>jane:good, and you?
+  jane-->sally:great. k bye
+  sally->>jane:bye
+```
 

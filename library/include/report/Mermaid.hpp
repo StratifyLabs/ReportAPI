@@ -31,7 +31,7 @@ public:
   class Node {
   public:
     Node() {}
-    Node(const var::StringView text, Shape shape);
+    Node(const var::StringView text, Shape shape = Shape::round);
 
   private:
     API_RAC(Node, var::KeyString, node);
@@ -44,6 +44,7 @@ public:
     API_AF(Construct, Section *, writer, nullptr);
   };
 
+  Mermaid() {}
   Mermaid(printer::Printer &printer, const Construct &options);
 
   static var::StringView get_class_type() { return "mmd"; }
@@ -51,6 +52,8 @@ public:
 
 class MermaidGraph : public Mermaid {
 public:
+  MermaidGraph() {}
+
   MermaidGraph(
     printer::Printer &printer,
     const var::StringView name,
@@ -69,7 +72,7 @@ public:
     const Node &to,
     const var::StringView message = var::StringView());
 
-  var::KeyString get_transition_string() const;
+  var::GeneralString get_transition_string() const;
 
 private:
   u32 m_sequence_count;
@@ -83,6 +86,7 @@ private:
 
 class CallGraph {
 public:
+  CallGraph() {}
   explicit CallGraph(printer::Printer &printer, const var::StringView name)
     : m_mermaid_graph(printer, name, "LR") {}
 
@@ -127,8 +131,8 @@ class Printer;
 Printer &operator<<(Printer &printer, const report::MermaidGraph &a);
 } // namespace printer
 
-#define CALL_GRAPH_TRACE_FUNCTION(graph)                                       \
-  (report::CallGraphNode call_graph_node                                       \
-   = report::CallGraphNode(graph, __FUNCTION__))
+#define CALL_GRAPH_TRACE_FUNCTION(printer, graph)                              \
+  report::CallGraphNode call_graph_node                                        \
+    = report::CallGraphNode(printer, graph, __FUNCTION__)
 
 #endif // REPORTAPI_REPORT_MERMAID_HPP
