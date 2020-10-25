@@ -1,24 +1,30 @@
 #ifndef REPORTAPI_REPORT_HISTOGRAM_HPP
 #define REPORTAPI_REPORT_HISTOGRAM_HPP
 
-#include "Writer.hpp"
+#include "Section.hpp"
 
 namespace report {
 
-class Histogram : public Writer {
+class Histogram : public Section {
 public:
-  class Options {
-    API_AC(Options, var::String, name);
-    API_AC(Options, var::String, labels);
-  };
+  Histogram() {} // used as a placeholder
 
-  Histogram(const Options &options);
+  Histogram(
+    printer::Printer &printer,
+    const var::StringView name,
+    const var::StringViewList header_list);
 
   static var::StringView get_class_type() { return "hist"; }
 
-  Histogram &write_row(const var::StringView row);
+private:
+  API_AC(Histogram, var::StringViewList, row);
 };
 
 } // namespace report
+
+namespace printer {
+class Printer;
+Printer &operator<<(Printer &printer, const report::Histogram &a);
+} // namespace printer
 
 #endif // REPORTAPI_REPORT_HISTOGRAM_HPP

@@ -2,65 +2,72 @@
 #define REPORTAPI_REPORT_PARSER_HPP
 
 #include <fs/File.hpp>
+#include <var/Queue.hpp>
 #include <var/StackString.hpp>
-#include <var/Vector.hpp>
+
+#include "Section.hpp"
 
 namespace report {
 
-class Parser {
+class Parser : public api::ExecutionContext {
 public:
-  class Options {
-    API_AC(Options, var::StringView, path); // path to a directory or file
-  };
-
-  Parser(const Options &options);
-
-  Parser &parse(const var::StringView input);
-
-  int create_report();
+  Parser(const fs::File &input);
+  Parser &create_report(const fs::File &output);
 
 private:
   class IntermediateData {
   public:
-    bool operator==(const IntermediateData &a) const {
-      return type() == a.type() && name() == a.name();
+    IntermediateData(const var::StringView line) {
+      const size_t position = line.find(":");
+      set_prefix(line.get_substring_with_length(position));
+      if (prefix().is_empty()) {
+        set_prefix(Section::generate_prefix("raw", "text"));
+      }
     }
 
-    var::PathString get_file_path(const var::StringView directory_path) {
-      return (var::PathString(directory_path) / type().string_view())
-        .append("_")
-        .append(name().string_view())
-        .append(".txt");
+    bool operator==(const IntermediateData &a) const {
+      return prefix() == a.prefix();
     }
+
+    IntermediateData &push(const var::StringView line) {
+      if (line.find(prefix()) != 0) {
+        return *this;
+      }
+      const size_t position = line.find(":");
+      if (line.length() > position + 1) {
+        entry_list().push_back(
+          line.get_substring_at_position(position + 1).pop_back().get_string());
+      }
+      return *this;
+    }
+
+    void generate(const fs::File &output) const;
 
   private:
-    API_AC(IntermediateData, var::String, type);
-    API_AC(IntermediateData, var::String, name);
+    API_AS(IntermediateData, prefix);
     API_AC(IntermediateData, var::StringList, entry_list);
+
+    const var::StringView type() const { return Section::get_type(prefix()); }
+    const var::StringView name() const { return Section::get_name(prefix()); }
+
+    const var::StringView timestamp(const var::StringView &entry) const {
+      const size_t position = entry.find(":");
+      return entry.get_substring_with_length(position);
+    }
+    const var::StringView content(const var::StringView &entry) const {
+      const size_t position = entry.find(":");
+      return entry.get_substring_at_position(position + 1);
+    }
+
+    bool is_type_valid() const;
+
+    void generate_csv_chart(const fs::File &output) const;
+    void generate_csv_table(const fs::File &output) const;
+    void generate_histogram_chart(const fs::File &output) const;
+    void generate_passthrough(const fs::File &output) const;
+    void generate_raw(const fs::File &output) const;
   };
-
-  API_RAB(Parser, valid, false);       // used if path is a empty
-  API_AC(Parser, var::String, output); // used if path is a empty
-  var::Vector<IntermediateData>
-    m_intermediate_data_list; // used if path is a file or empty
-  var::String m_directory_path;
-  var::String m_file_name;
-  var::String m_partial_line;
-
-  bool is_use_intermediate_data() const { return m_directory_path.is_empty(); }
-
-  bool is_type_valid(const var::StringView class_type) const;
-
-  Parser &parse_line(const var::String &input);
-  int generate_csv_chart(const fs::File *output, const IntermediateData &data);
-  int generate_csv_table(const fs::File *output, const IntermediateData &data);
-  int generate_histogram_chart(
-    const fs::File *output,
-    const IntermediateData &data);
-  int generate_passthrough(
-    const fs::File *output,
-    const IntermediateData &data);
-  int generate_raw(const fs::File *output, const IntermediateData &data);
+  var::Queue<IntermediateData> m_data_list;
 };
 
 } // namespace report

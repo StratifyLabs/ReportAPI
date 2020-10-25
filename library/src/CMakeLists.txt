@@ -1,7 +1,7 @@
 
 
 set(SOURCES
-	Writer.cpp
+	Section.cpp
 	Parser.cpp
 	MessageSequenceDiagram.cpp
 	Histogram.cpp
@@ -10,5 +10,6 @@ set(SOURCES
 	Csv.cpp
 	Table.cpp
 	Flowchart.cpp
+	ReportPrinter.cpp
 	PARENT_SCOPE
 	)

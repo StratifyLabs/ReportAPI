@@ -1,7 +1,7 @@
 
 
 set(SOURCES
-	report/Writer.hpp
+	report/Section.hpp
 	report/Parser.hpp
 	report/MessageSequenceDiagram.hpp
 	report/Histogram.hpp
@@ -10,6 +10,7 @@ set(SOURCES
 	report/Csv.hpp
 	report/Table.hpp
 	report/Flowchart.hpp
+	report/ReportPrinter.hpp
 	report.hpp
 	PARENT_SCOPE
 	)

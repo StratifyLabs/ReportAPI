@@ -3,11 +3,13 @@
 
 namespace report{}
 
-#include "report/Writer.hpp"
-#include "report/Parser.hpp"
 #include "report/Csv.hpp"
 #include "report/Histogram.hpp"
 #include "report/Mermaid.hpp"
+#include "report/MessageSequenceDiagram.hpp"
+#include "report/Parser.hpp"
+#include "report/ReportPrinter.hpp"
+#include "report/Section.hpp"
 #include "report/Table.hpp"
 
 using namespace report;

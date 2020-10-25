@@ -1,44 +1,60 @@
 #ifndef REPORTAPI_REPORT_MESSAGESEQUENCEDIAGRAM_HPP
 #define REPORTAPI_REPORT_MESSAGESEQUENCEDIAGRAM_HPP
 
-#include "Writer.hpp"
+#include "Section.hpp"
 
 namespace report {
 
-class MessageSequenceDiagram : public Writer {
+class MessageSequenceDiagram : public Section {
 public:
-  MessageSequenceDiagram();
+  MessageSequenceDiagram() {}
+  MessageSequenceDiagram(printer::Printer &printer, const var::StringView name);
 
-  static var::StringView get_class_type() { return "msd"; }
+  static var::StringView get_class_type() { return "mmd"; }
 
   class MessageOptions {
-    API_AC(MessageOptions, var::String, source);
-    API_AC(MessageOptions, var::String, destination);
-    API_AC(MessageOptions, var::String, message);
+    API_AC(MessageOptions, var::StringView, source);
+    API_AC(MessageOptions, var::StringView, destination);
+    API_AC(MessageOptions, var::StringView, message);
   };
 
-  MessageSequenceDiagram &write_message(const MessageOptions &options) {
-    write(
-      options.source() + "->" + options.destination() + ":"
-      + options.message());
-    return *this;
+  MessageSequenceDiagram &set_participant(const var::StringView name) {
+    return set_value(var::PathString("participant").append(name));
   }
 
-  MessageSequenceDiagram &write_message_alt(const MessageOptions &options) {
-    write(
-      options.source() + "->>" + options.destination() + ":"
-      + options.message());
-    return *this;
+  MessageSequenceDiagram &set_message(const MessageOptions &options) {
+    return set_value(var::PathString(options.source())
+                       .append("->")
+                       .append(options.destination())
+                       .append(":")
+                       .append(options.message()));
   }
 
-  MessageSequenceDiagram &write_message_dotted(const MessageOptions &options) {
-    write(
-      options.source() + "-->" + options.destination() + ": "
-      + options.message());
-    return *this;
+  MessageSequenceDiagram &set_message_alt(const MessageOptions &options) {
+    return set_value(var::PathString(options.source())
+                       .append("->>")
+                       .append(options.destination())
+                       .append(":")
+                       .append(options.message()));
   }
+
+  MessageSequenceDiagram &set_message_dotted(const MessageOptions &options) {
+    return set_value(var::PathString(options.source())
+                       .append("-->")
+                       .append(options.destination())
+                       .append(":")
+                       .append(options.message()));
+  }
+
+private:
+  API_AC(MessageSequenceDiagram, var::PathString, value);
 };
 
 } // namespace report
+
+namespace printer {
+class Printer;
+Printer &operator<<(Printer &printer, const report::MessageSequenceDiagram &a);
+} // namespace printer
 
 #endif // REPORTAPI_REPORT_MESSAGESEQUENCEDIAGRAM_HPP

@@ -1,29 +1,30 @@
 #ifndef REPORTAPI_REPORT_TABLE_HPP
 #define REPORTAPI_REPORT_TABLE_HPP
 
-#include "Writer.hpp"
+#include "Section.hpp"
 
 namespace report {
 
-class Table : public Writer {
+class Table : public Section {
 public:
-  Table();
+  Table() {} // used as a placeholder
 
-  class Options {
-    API_AC(Options, var::String, name);
-    API_AC(Options, var::String, header);
-  };
+  Table(
+    printer::Printer &printer,
+    const var::StringView name,
+    const var::StringViewList header_list);
 
   static var::StringView get_class_type() { return "tab"; }
 
-  explicit Table(const Options &options);
-
-  Table &write_row(const var::String &value) {
-    write(value);
-    return *this;
-  }
+private:
+  API_AC(Table, var::StringViewList, row);
 };
 
 } // namespace report
+
+namespace printer {
+class Printer;
+Printer &operator<<(Printer &printer, const report::Table &a);
+} // namespace printer
 
 #endif // REPORTAPI_REPORT_TABLE_HPP

@@ -1,11 +1,11 @@
 #ifndef REPORTAPI_REPORT_KATEX_HPP
 #define REPORTAPI_REPORT_KATEX_HPP
 
-#include "Writer.hpp"
+#include "Section.hpp"
 
 namespace report {
 
-class Katex : public Writer {
+class Katex : public Section {
 public:
   Katex();
 

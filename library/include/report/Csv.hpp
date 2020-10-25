@@ -1,29 +1,35 @@
 #ifndef REPORTAPI_REPORT_CSV_HPP
 #define REPORTAPI_REPORT_CSV_HPP
 
-#include "Writer.hpp"
+#include "Section.hpp"
 
 namespace report {
 
-class Csv : public WriterAccess<Csv> {
+class Csv : public Section {
 public:
-  class Options {
-    API_AC(Options, var::String, name);
-    API_AC(Options, var::String, header);
-  };
+  Csv() {} // used as a placeholder
+
+  Csv(
+    printer::Printer &printer,
+    const var::StringView name,
+    const var::StringViewList &header_list);
 
   static var::StringView get_class_type() { return "csv"; }
 
-  explicit Csv(const Options &options);
-
-  Csv &write_row(const var::StringView value) {
-    write(value);
+  Csv &set_row(var::StringViewList &&value) {
+    m_row = std::move(value);
     return *this;
   }
 
 private:
+  API_AC(Csv, var::StringViewList, row);
 };
 
 } // namespace report
+
+namespace printer {
+class Printer;
+Printer &operator<<(Printer &printer, const report::Csv &a);
+} // namespace printer
 
 #endif // REPORTAPI_REPORT_CSV_HPP

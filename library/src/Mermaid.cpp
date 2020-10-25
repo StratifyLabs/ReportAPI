@@ -1,87 +1,134 @@
+
+
 #include "report/Mermaid.hpp"
+
+namespace printer {
+class Printer;
+
+Printer &operator<<(Printer &printer, const report::MermaidGraph &a) {
+  printer.array(a.prefix(), a.get_transition_string());
+  return printer;
+} // namespace printer
+
+} // namespace printer
 
 using namespace report;
 
-u32 MermaidNode::m_count = 0;
+u32 Mermaid::Node::m_count = 0;
 
-Mermaid::Mermaid(const Options &options) {
-  set_name(var::String(options.name()));
-  set_type(var::String(get_class_type()));
-  set_prefix(get_prefix());
-
-  write(var::String(options.diagram()));
+Mermaid::Mermaid(printer::Printer &printer, const Construct &options) {
+  set_prefix(generate_prefix(get_class_type(), options.name()));
+  printer.key(prefix(), options.diagram());
 }
 
-MermaidGraph::MermaidGraph(const Options &options)
-  : Mermaid(Mermaid::Options()
-              .set_name(options.name())
-              .set_diagram("graph " + options.direction())) {}
+MermaidGraph::MermaidGraph(
+  printer::Printer &printer,
+  const var::StringView name,
+  const var::StringView direction)
+  : Mermaid(
+    printer,
+    Mermaid::Construct().set_name(name).set_diagram(
+      var::KeyString("graph ").append(direction))) {}
 
-MermaidNode::MermaidNode(var::StringView text, enum shapes shape) {
+Mermaid::Node::Node(const var::StringView text, Shape shape) {
   switch (shape) {
-  case shape_square:
-    m_node = var::String().format("n%d[%s]", m_count++, text);
+  case Shape::square:
+    m_node = var::KeyString().format("n%d[%s]", m_count++, text);
     return;
-  case shape_round:
-    m_node = var::String().format("n%d(%s)", m_count++, text);
+  case Shape::round:
+    m_node = var::KeyString().format("n%d(%s)", m_count++, text);
     return;
-  case shape_stadium:
-    m_node = var::String().format("n%d([%s])", m_count++, text);
+  case Shape::stadium:
+    m_node = var::KeyString().format("n%d([%s])", m_count++, text);
     return;
-  case shape_subroutine:
-    m_node = var::String().format("n%d[[%s]]", m_count++, text);
+  case Shape::subroutine:
+    m_node = var::KeyString().format("n%d[[%s]]", m_count++, text);
     return;
-  case shape_cylinder:
-    m_node = var::String().format("n%d[(%s)]", m_count++, text);
+  case Shape::cylinder:
+    m_node = var::KeyString().format("n%d[(%s)]", m_count++, text);
     return;
-  case shape_circle:
-    m_node = var::String().format("n%d((%s))", m_count++, text);
+  case Shape::circle:
+    m_node = var::KeyString().format("n%d((%s))", m_count++, text);
     return;
-  case shape_asymmetric:
-    m_node = var::String().format("n%d>%s]", m_count++, text);
+  case Shape::asymmetric:
+    m_node = var::KeyString().format("n%d>%s]", m_count++, text);
     return;
-  case shape_rhombus:
-    m_node = var::String().format("n%d{%s}", m_count++, text);
+  case Shape::rhombus:
+    m_node = var::KeyString().format("n%d{%s}", m_count++, text);
     return;
-  case shape_hexagon:
-    m_node = var::String().format("n%d{{%s}}", m_count++, text);
+  case Shape::hexagon:
+    m_node = var::KeyString().format("n%d{{%s}}", m_count++, text);
     return;
-  case shape_parallelogram:
-    m_node = var::String().format("n%d[/%s/]", m_count++, text);
+  case Shape::parallelogram:
+    m_node = var::KeyString().format("n%d[/%s/]", m_count++, text);
     return;
-  case shape_parallelogram_alternate:
-    m_node = var::String().format("n%d[\\%s\\]", m_count++, text);
+  case Shape::parallelogram_alternate:
+    m_node = var::KeyString().format("n%d[\\%s\\]", m_count++, text);
     return;
-  case shape_trapezoid:
-    m_node = var::String().format("n%d[/%s\\]", m_count++, text);
+  case Shape::trapezoid:
+    m_node = var::KeyString().format("n%d[/%s\\]", m_count++, text);
     return;
-  case shape_trapezoid_alternate:
-    m_node = var::String().format("n%d[\\%s/]", m_count++, text);
+  case Shape::trapezoid_alternate:
+    m_node = var::KeyString().format("n%d[\\%s/]", m_count++, text);
     return;
   }
 }
 
-var::StringView MermaidGraph::get_link_string(enum links link) {
+var::StringView MermaidGraph::get_link_string(Link link) const {
   switch (link) {
-  case link_arrow:
+  case Link::arrow:
     return "-->";
-  case link_open:
+  case Link::open:
     return " --- ";
-  case link_dotted:
+  case Link::dotted:
     return "-.->";
-  case link_thick:
+  case Link::thick:
     return "==>";
   }
   return "-->";
 }
 
-MermaidGraph &MermaidGraph::transition(
-  const MermaidNode &from,
-  enum links link_arrow,
-  const MermaidNode &to,
-  const var::StringView &message) {
-  write(
-    var::String("  ") + from.node() + get_link_string(link_arrow)
-    + (message.is_empty() ? var::String() : (var::String("|") + message + "|") + to.node()));
+MermaidGraph &MermaidGraph::set_transition(
+  const Node &from,
+  Link link_arrow,
+  const Node &to,
+  const var::StringView message) {
+  return set_from(from).set_to(to).set_link(link_arrow).set_message(message);
+}
+
+var::KeyString MermaidGraph::get_transition_string() const {
+  return std::move(var::KeyString("  ")
+                     .append(m_from.node())
+                     .append(get_link_string(m_link))
+                     .append(
+                       m_message.is_empty()
+                         ? var::KeyString()
+                         : (var::KeyString("|").append(m_message).append("|")))
+                     .append(m_to.node()));
+}
+
+CallGraph &
+CallGraph::push(printer::Printer &printer, const var::StringView name) {
+  Mermaid::Node node(name, Mermaid::Shape::round);
+  if (m_call_stack.count()) {
+    printer << m_mermaid_graph.set_transition(
+      m_call_stack.top(),
+      MermaidGraph::Link::arrow,
+      node,
+      var::NumberString(m_transition_counter++));
+  }
+  m_call_stack.push(node);
+  return *this;
+}
+
+CallGraph &
+CallGraph::data(printer::Printer &printer, const var::StringView data) {
+  if (m_call_stack.count()) {
+    printer << m_mermaid_graph.set_transition(
+      m_call_stack.top(),
+      report::MermaidGraph::Link::arrow,
+      Mermaid::Node(data, Mermaid::Shape::cylinder),
+      var::NumberString(m_transition_counter++));
+  }
   return *this;
 }

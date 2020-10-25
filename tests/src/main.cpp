@@ -1,5 +1,6 @@
 ﻿
 #include "UnitTest.hpp"
+#include "report/ReportPrinter.hpp"
 
 #define VERSION "0.1"
 #include "sys/Cli.hpp"
