@@ -19,9 +19,13 @@ private:
   public:
     IntermediateData(const var::StringView line) {
       const size_t position = line.find(":");
-      set_prefix(line.get_substring_with_length(position));
-      if (prefix().is_empty()) {
+      if (position == var::StringView::npos) {
         set_prefix(Section::generate_prefix("raw", "text"));
+      } else {
+        set_prefix(line.get_substring_with_length(position));
+        if (prefix().find("/") == var::StringView::npos) {
+          set_prefix(Section::generate_prefix("", "text"));
+        }
       }
     }
 
@@ -52,10 +56,17 @@ private:
 
     const var::StringView timestamp(const var::StringView &entry) const {
       const size_t position = entry.find(":");
+      if (position == var::StringView::npos) {
+        return var::StringView();
+      }
       return entry.get_substring_with_length(position);
     }
+
     const var::StringView content(const var::StringView &entry) const {
       const size_t position = entry.find(":");
+      if (position == var::StringView::npos) {
+        return entry;
+      }
       return entry.get_substring_at_position(position + 1);
     }
 

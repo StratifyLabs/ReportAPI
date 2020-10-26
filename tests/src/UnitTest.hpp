@@ -25,6 +25,8 @@ class UnitTest : public test::Test {
       m_file.write(value);
     }
 
+    const File &file() const { return m_file; }
+
   private:
     File m_file;
   };
@@ -36,6 +38,8 @@ public:
   UnitTest(var::StringView name) : test::Test(name) {}
 
   bool execute_class_api_case() {
+
+    m_report_printer.file().write("Hello World\n");
     m_call_graph = CallGraph(m_report_printer, "callgraph");
 
     CALL_GRAPH_TRACE_FUNCTION(m_report_printer, m_call_graph);
