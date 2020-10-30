@@ -140,7 +140,7 @@ void Parser::IntermediateData::generate_csv_chart(
   StringViewList header_list = content(entry_list().front()).split(",");
 
   ChartJs chart;
-  chart.set_type(ChartJs::type_line);
+  chart.set_type(ChartJs::Type::line);
 
   Array<String, 2> x_extrema;
 
@@ -177,7 +177,7 @@ void Parser::IntermediateData::generate_csv_chart(
         .append_x_axis(
           ChartJsAxis()
             .set_display(true)
-            .set_type(ChartJsAxis::type_linear)
+            .set_type(ChartJsAxis::Type::linear)
             .set_ticks(ChartJsAxisTicks()
                          .set_minimum(x_extrema.at(0).to_float())
                          .set_maximum(x_extrema.at(1).to_float())
@@ -185,7 +185,7 @@ void Parser::IntermediateData::generate_csv_chart(
             .set_scale_label(ChartJsScaleLabel().set_display(true).set_label(
               String(header_list.at(0)))))
         .append_y_axis(
-          ChartJsAxis().set_type(ChartJsAxis::type_linear).set_display(true)))
+          ChartJsAxis().set_type(ChartJsAxis::Type::linear).set_display(true)))
     .set_legend(ChartJsLegend().set_display(true))
     .set_title(
       ChartJsTitle().set_display(true).set_text(name() + "(" + type() + ")"));
@@ -210,7 +210,7 @@ void Parser::IntermediateData::generate_histogram_chart(
   }
 
   ChartJs chart;
-  chart.set_type(ChartJs::type_bar);
+  chart.set_type(ChartJs::Type::bar);
   for (const auto value : header_list) {
     chart.data().label_list().push_back(String(value));
   }
@@ -234,11 +234,11 @@ void Parser::IntermediateData::generate_histogram_chart(
         .append_x_axis(
           ChartJsAxis()
             .set_display(true)
-            .set_type(ChartJsAxis::type_category)
+            .set_type(ChartJsAxis::Type::category)
             .set_scale_label(
               ChartJsScaleLabel().set_display(true).set_label(String("bin"))))
         .append_y_axis(
-          ChartJsAxis().set_type(ChartJsAxis::type_linear).set_display(true)))
+          ChartJsAxis().set_type(ChartJsAxis::Type::linear).set_display(true)))
     .set_legend(ChartJsLegend().set_display(true))
     .set_title(
       ChartJsTitle().set_display(true).set_text(name() + "(" + type() + ")"));
