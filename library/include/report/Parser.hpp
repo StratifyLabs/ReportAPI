@@ -11,8 +11,8 @@ namespace report {
 
 class Parser : public api::ExecutionContext {
 public:
-  Parser(const fs::File &input);
-  Parser &create_report(const fs::File &output);
+  Parser(const fs::FileObject &input);
+  Parser &create_report(const fs::FileObject &output);
 
 private:
   class IntermediateData {
@@ -45,7 +45,7 @@ private:
       return *this;
     }
 
-    void generate(const fs::File &output) const;
+    void generate(const fs::FileObject &output) const;
 
   private:
     API_AS(IntermediateData, prefix);
@@ -72,12 +72,12 @@ private:
 
     bool is_type_valid() const;
 
-    void generate_csv_chart(const fs::File &output) const;
-    void generate_csv_table(const fs::File &output) const;
-    void generate_histogram_chart(const fs::File &output) const;
-    void generate_mermaid(const fs::File &output) const;
-    void generate_passthrough(const fs::File &output) const;
-    void generate_raw(const fs::File &output) const;
+    void generate_csv_chart(const fs::FileObject &output) const;
+    void generate_csv_table(const fs::FileObject &output) const;
+    void generate_histogram_chart(const fs::FileObject &output) const;
+    void generate_mermaid(const fs::FileObject &output) const;
+    void generate_passthrough(const fs::FileObject &output) const;
+    void generate_raw(const fs::FileObject &output) const;
   };
   var::Queue<IntermediateData> m_data_list;
 };

@@ -14,7 +14,7 @@
 
 using namespace report;
 
-Parser::Parser(const fs::File &input) {
+Parser::Parser(const fs::FileObject &input) {
   DataFile f = DataFile().reserve(input.size()).write(input).seek(0).move();
   bool is_done = false;
   do {
@@ -31,7 +31,7 @@ Parser::Parser(const fs::File &input) {
   } while (is_done == false);
 }
 
-Parser &Parser::create_report(const fs::File &output) {
+Parser &Parser::create_report(const fs::FileObject &output) {
   printf("gen report\n");
   for (const auto &data : m_data_list) {
     data.generate(output);
@@ -48,7 +48,7 @@ bool Parser::IntermediateData::is_type_valid() const {
          || type() == Table::get_class_type() || type() == "";
 }
 
-void Parser::IntermediateData::generate(const fs::File &output) const {
+void Parser::IntermediateData::generate(const fs::FileObject &output) const {
   if (is_type_valid() == false) {
     return;
   }
@@ -66,7 +66,8 @@ void Parser::IntermediateData::generate(const fs::File &output) const {
   }
 }
 
-void Parser::IntermediateData::generate_mermaid(const fs::File &output) const {
+void Parser::IntermediateData::generate_mermaid(
+  const fs::FileObject &output) const {
   output.write(String("**") + name() + "**\n\n").write("```mermaid\n");
 
   for (const auto entry : entry_list()) {
@@ -78,7 +79,7 @@ void Parser::IntermediateData::generate_mermaid(const fs::File &output) const {
 }
 
 void Parser::IntermediateData::generate_passthrough(
-  const fs::File &output) const {
+  const fs::FileObject &output) const {
   output.write(String("**") + name() + "**\n\n")
     .write(String("```") + type() + "\n");
 
@@ -91,7 +92,7 @@ void Parser::IntermediateData::generate_passthrough(
 }
 
 void Parser::IntermediateData::generate_csv_table(
-  const fs::File &output) const {
+  const fs::FileObject &output) const {
 
   output.write(String("**") + name() + "**\n\n");
 
@@ -134,7 +135,7 @@ void Parser::IntermediateData::generate_csv_table(
 }
 
 void Parser::IntermediateData::generate_csv_chart(
-  const fs::File &output) const {
+  const fs::FileObject &output) const {
   // csv is not trivially handled -- needs some parsing
 
   StringViewList header_list = content(entry_list().front()).split(",");
@@ -196,7 +197,7 @@ void Parser::IntermediateData::generate_csv_chart(
 }
 
 void Parser::IntermediateData::generate_histogram_chart(
-  const fs::File &output) const {
+  const fs::FileObject &output) const {
   // no data here
   if (entry_list().count() < 1) {
     output.write(StringView("> No data is available\n\n"));

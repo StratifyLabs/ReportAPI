@@ -11,7 +11,6 @@ namespace report {
 
 class Section {
 public:
-  typedef int (*write_function_t)(void *context, const char *buffer, int nbyte);
 
   Section();
 
