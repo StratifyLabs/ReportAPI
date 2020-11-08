@@ -144,7 +144,6 @@ void Parser::IntermediateData::generate_csv_chart(
   Array<String, 2> x_extrema;
 
   u32 color = 0;
-
   for (u32 i = 1; i < header_list.count(); i++) {
 
     ChartJsDataSet data_set;
