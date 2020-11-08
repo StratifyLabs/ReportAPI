@@ -32,7 +32,6 @@ Parser::Parser(const fs::FileObject &input) {
 }
 
 Parser &Parser::create_report(const fs::FileObject &output) {
-  printf("gen report\n");
   for (const auto &data : m_data_list) {
     data.generate(output);
   }
@@ -72,7 +71,6 @@ void Parser::IntermediateData::generate_mermaid(
 
   for (const auto entry : entry_list()) {
     output.write(content(entry));
-    output.write("\n");
   }
 
   output.write(String("```\n\n"));

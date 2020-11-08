@@ -4,6 +4,7 @@
 #include <fs/File.hpp>
 #include <var/Queue.hpp>
 #include <var/StackString.hpp>
+#include <var/Tokenizer.hpp>
 
 #include "Section.hpp"
 
@@ -37,11 +38,16 @@ private:
       if (line.find(prefix()) != 0) {
         return *this;
       }
-      const size_t position = line.find(":");
-      if (line.length() > position + 1) {
-        entry_list().push_back(
-          line.get_substring_at_position(position + 1).pop_back().get_string());
+      var::Tokenizer list(
+        line,
+        var::Tokenizer::Construct()
+          .set_delimeters(":")
+          .set_maximum_delimeter_count(2));
+
+      if (list.count() == 3) {
+        entry_list().push_back(list.at(2).get_string());
       }
+
       return *this;
     }
 
