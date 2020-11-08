@@ -70,7 +70,7 @@ void Parser::IntermediateData::generate_mermaid(
   output.write(String("**") + name() + "**\n\n").write("```mermaid\n");
 
   for (const auto entry : entry_list()) {
-    output.write(content(entry));
+    output.write(content(entry.content()));
   }
 
   output.write(String("```\n\n"));
@@ -82,8 +82,7 @@ void Parser::IntermediateData::generate_passthrough(
     .write(String("```") + type() + "\n");
 
   for (const auto entry : entry_list()) {
-    output.write(content(entry));
-    output.write("\n");
+    output.write(content(entry.content()));
   }
 
   output.write(String("```\n\n"));
@@ -98,7 +97,7 @@ void Parser::IntermediateData::generate_csv_table(
   String line;
 
   for (const auto &entry : entry_list()) {
-    const StringViewList list = content(entry).split(",");
+    const StringViewList list = content(entry.content()).split(",");
     if (is_header_written == false) {
       is_header_written = true;
       {
@@ -136,7 +135,8 @@ void Parser::IntermediateData::generate_csv_chart(
   const fs::FileObject &output) const {
   // csv is not trivially handled -- needs some parsing
 
-  StringViewList header_list = content(entry_list().front()).split(",");
+  StringViewList header_list
+    = content(entry_list().front().content()).split(",");
 
   ChartJs chart;
   chart.set_type(ChartJs::Type::line);
@@ -154,7 +154,8 @@ void Parser::IntermediateData::generate_csv_chart(
       .set_background_color(ChartJsColor().set_alpha(0));
 
     for (u32 j = 1; j < entry_list().count(); j++) {
-      const StringViewList data_list = content(entry_list().at(j)).split(",");
+      const StringViewList data_list
+        = content(entry_list().at(j).content()).split(",");
       if (x_extrema.at(0).is_empty()) {
         x_extrema.at(0) = String(data_list.at(0));
       }
@@ -202,7 +203,8 @@ void Parser::IntermediateData::generate_histogram_chart(
     return;
   }
 
-  StringViewList header_list = content(entry_list().front()).split(",");
+  StringViewList header_list
+    = content(entry_list().front().content()).split(",");
   if (header_list.count() < 1) {
     output.write(StringView("> No data is available\n\n"));
     return;
@@ -219,7 +221,8 @@ void Parser::IntermediateData::generate_histogram_chart(
     data_set.set_label(name())
       .set_border_color(ChartJsColor::get_standard(i).set_alpha(255))
       .set_background_color(ChartJsColor::get_standard(i).set_alpha(128));
-    StringViewList value_list = content(entry_list().at(i)).split(",");
+    StringViewList value_list
+      = content(entry_list().at(i).content()).split(",");
 
     for (const auto value : value_list) {
       data_set.append(JsonString(value));

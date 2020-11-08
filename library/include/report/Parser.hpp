@@ -18,6 +18,11 @@ public:
 private:
   class IntermediateData {
   public:
+    class Entry {
+      API_AS(Entry, timestamp);
+      API_AS(Entry, content);
+    };
+
     IntermediateData(const var::StringView line) {
       const size_t position = line.find(":");
       if (position == var::StringView::npos) {
@@ -45,7 +50,9 @@ private:
           .set_maximum_delimeter_count(2));
 
       if (list.count() == 3) {
-        entry_list().push_back(list.at(2).get_string());
+        entry_list().push_back(Entry()
+                                 .set_timestamp(list.at(1).get_string())
+                                 .set_content(list.at(2).get_string()));
       }
 
       return *this;
@@ -55,7 +62,7 @@ private:
 
   private:
     API_AS(IntermediateData, prefix);
-    API_AC(IntermediateData, var::StringList, entry_list);
+    API_AC(IntermediateData, var::Vector<Entry>, entry_list);
 
     const var::StringView type() const { return Section::get_type(prefix()); }
     const var::StringView name() const { return Section::get_name(prefix()); }
