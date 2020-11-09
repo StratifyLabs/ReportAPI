@@ -1,4 +1,5 @@
-﻿
+﻿#include <signal.h>
+
 #include "UnitTest.hpp"
 #include "report/ReportPrinter.hpp"
 
