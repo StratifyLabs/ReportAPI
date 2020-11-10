@@ -99,14 +99,14 @@ MermaidGraph &MermaidGraph::set_transition(
 
 var::GeneralString MermaidGraph::get_transition_string() const {
   API_ASSERT(prefix().is_empty() == false);
-  return std::move(var::GeneralString("  ")
+	return var::GeneralString("  ")
                      .append(m_from.node())
                      .append(get_link_string(m_link))
                      .append(
                        m_message.is_empty()
                          ? var::KeyString()
                          : (var::KeyString("|").append(m_message).append("|")))
-                     .append(m_to.node()));
+										 .append(m_to.node());
 }
 
 CallGraph &
