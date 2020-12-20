@@ -1,3 +1,5 @@
+// Copyright 2020-2021 Tyler Gilbert and Stratify Labs, Inc; see LICENSE.md
+
 #ifndef REPORTAPI_REPORT_PARSER_HPP
 #define REPORTAPI_REPORT_PARSER_HPP
 
@@ -51,8 +53,8 @@ private:
 
       if (list.count() == 3) {
         entry_list().push_back(Entry()
-                                 .set_timestamp(list.at(1).get_string())
-                                 .set_content(list.at(2).get_string()));
+                                 .set_timestamp(list.at(1).to_string())
+                                 .set_content(list.at(2).to_string()));
       }
 
       return *this;

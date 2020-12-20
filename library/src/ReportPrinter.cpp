@@ -1,3 +1,5 @@
+// Copyright 2020-2021 Tyler Gilbert and Stratify Labs, Inc; see LICENSE.md
+
 #include <chrono.hpp>
 
 #include "report/ReportPrinter.hpp"
@@ -10,7 +12,7 @@ ReportPrinter::ReportPrinter()
 }
 
 ClockTime::UniqueString ReportPrinter::get_timestamp() const {
-  ClockTime age = m_start.age();
+  ClockTime age = m_start.get_age();
   return ClockTime::UniqueString().format(
     "%ld.%06ld",
     age.seconds(),

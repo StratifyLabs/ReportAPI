@@ -1,3 +1,5 @@
+// Copyright 2020-2021 Tyler Gilbert and Stratify Labs, Inc; see LICENSE.md
+
 #ifndef REPORTAPI_REPORT_SECTION_HPP
 #define REPORTAPI_REPORT_SECTION_HPP
 
@@ -15,7 +17,7 @@ public:
   Section();
 
   chrono::ClockTime::UniqueString get_unique_name() const {
-    return chrono::ClockTime::get_unique_string();
+    return chrono::ClockTime::get_system_time().to_unique_string();
   }
 
   static var::StringView get_type(const var::StringView prefix) {

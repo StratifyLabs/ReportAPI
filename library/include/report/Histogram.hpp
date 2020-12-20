@@ -1,3 +1,5 @@
+// Copyright 2020-2021 Tyler Gilbert and Stratify Labs, Inc; see LICENSE.md
+
 #ifndef REPORTAPI_REPORT_HISTOGRAM_HPP
 #define REPORTAPI_REPORT_HISTOGRAM_HPP
 

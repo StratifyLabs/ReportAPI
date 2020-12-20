@@ -1,3 +1,5 @@
+// Copyright 2020-2021 Tyler Gilbert and Stratify Labs, Inc; see LICENSE.md
+
 #ifndef REPORTAPI_REPORT_KATEX_HPP
 #define REPORTAPI_REPORT_KATEX_HPP
 
