@@ -20,7 +20,7 @@ Parser::Parser(const fs::FileObject &input) {
   DataFile f = DataFile().reserve(input.size()).write(input).seek(0).move();
   bool is_done = false;
   do {
-    const String line = f.gets();
+    const auto line = f.gets();
     const IntermediateData line_data(line);
     if (m_data_list.find_offset(line_data) == m_data_list.count()) {
       m_data_list.push(line_data);
