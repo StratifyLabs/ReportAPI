@@ -33,43 +33,43 @@ MermaidGraph::MermaidGraph(
 Mermaid::Node::Node(const var::StringView text, Shape shape) {
   switch (shape) {
   case Shape::square:
-    m_node = var::KeyString().format("n%d[%s]", m_count++, text);
+    m_node = var::KeyString().format("n%d[", m_count++).append(text).append("]");
     return;
   case Shape::round:
-    m_node = var::KeyString().format("n%d(%s)", m_count++, text);
+    m_node = var::KeyString().format("n%d(", m_count++).append(text).append(")");
     return;
   case Shape::stadium:
-    m_node = var::KeyString().format("n%d([%s])", m_count++, text);
+      m_node = var::KeyString().format("n%d([", m_count++).append(text).append("])");
     return;
   case Shape::subroutine:
-    m_node = var::KeyString().format("n%d[[%s]]", m_count++, text);
+      m_node = var::KeyString().format("n%d[[", m_count++).append(text).append("]]");
     return;
   case Shape::cylinder:
-    m_node = var::KeyString().format("n%d[(%s)]", m_count++, text);
+      m_node = var::KeyString().format("n%d([", m_count++).append(text).append("])");
     return;
   case Shape::circle:
-    m_node = var::KeyString().format("n%d((%s))", m_count++, text);
+      m_node = var::KeyString().format("n%d((", m_count++).append(text).append("))");
     return;
   case Shape::asymmetric:
-    m_node = var::KeyString().format("n%d>%s]", m_count++, text);
+      m_node = var::KeyString().format("n%d>", m_count++).append(text).append("]");
     return;
   case Shape::rhombus:
-    m_node = var::KeyString().format("n%d{%s}", m_count++, text);
+      m_node = var::KeyString().format("n%d{", m_count++).append(text).append("}");
     return;
   case Shape::hexagon:
-    m_node = var::KeyString().format("n%d{{%s}}", m_count++, text);
+      m_node = var::KeyString().format("n%d{{", m_count++).append(text).append("}}");
     return;
   case Shape::parallelogram:
-    m_node = var::KeyString().format("n%d[/%s/]", m_count++, text);
+      m_node = var::KeyString().format("n%d[/", m_count++).append(text).append("/]");
     return;
   case Shape::parallelogram_alternate:
-    m_node = var::KeyString().format("n%d[\\%s\\]", m_count++, text);
+      m_node = var::KeyString().format("n%d[\\", m_count++).append(text).append("\\]");
     return;
   case Shape::trapezoid:
-    m_node = var::KeyString().format("n%d[/%s\\]", m_count++, text);
+      m_node = var::KeyString().format("n%d[/", m_count++).append(text).append("\\]");
     return;
   case Shape::trapezoid_alternate:
-    m_node = var::KeyString().format("n%d[\\%s/]", m_count++, text);
+      m_node = var::KeyString().format("n%d[\\", m_count++).append(text).append("/]");
     return;
   }
 }
