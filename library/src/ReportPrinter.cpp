@@ -24,9 +24,10 @@ void ReportPrinter::print_open_object(Level level, var::StringView key) {
   if (m_container.verbose_level() > verbose_level()) {
     return;
   }
-  interface_print_final(key);
-  interface_print_final(":");
+  interface_print_final("t:");
   interface_print_final(get_timestamp().string_view());
+  interface_print_final(":");
+  interface_print_final(key);
   interface_print_final(":");
   m_is_newline = true;
 }
@@ -43,9 +44,10 @@ void ReportPrinter::print_open_array(Level level, var::StringView key) {
   if (m_container.verbose_level() > verbose_level()) {
     return;
   }
-  interface_print_final(key);
-  interface_print_final(":");
+  interface_print_final("t:");
   interface_print_final(get_timestamp().string_view());
+  interface_print_final(":");
+  interface_print_final(key);
   interface_print_final(":");
   m_is_newline = true;
 }
