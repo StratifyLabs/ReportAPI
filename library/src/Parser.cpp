@@ -71,11 +71,11 @@ void Parser::IntermediateData::generate_mermaid(
   const fs::FileObject &output) const {
   output.write(String("**") + name() + "**\n\n").write("```mermaid\n");
 
-  for (const auto entry : entry_list()) {
+  for (const auto & entry : entry_list()) {
     output.write(content(entry.content()));
   }
 
-  output.write(String("```\n\n"));
+  output.write(StringView("```\n\n"));
 }
 
 void Parser::IntermediateData::generate_passthrough(
@@ -87,13 +87,13 @@ void Parser::IntermediateData::generate_passthrough(
     output.write(content(entry.content()));
   }
 
-  output.write(String("```\n\n"));
+  output.write(StringView("```\n\n"));
 }
 
 void Parser::IntermediateData::generate_csv_table(
   const fs::FileObject &output) const {
 
-  output.write(String("**") + name() + "**\n\n");
+  output.write(StringView("**") + name() + "**\n\n");
 
   bool is_header_written = false;
   String line;
